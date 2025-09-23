@@ -25,6 +25,17 @@ export default function SignUpPage() {
     const [emailCheck, setEmailCheck] = useState<null | boolean>(null);
     const [nicknameCheck, setNicknameCheck] = useState<null | boolean>(null);
 
+    const fieldLabels: Record<keyof User, string> = {
+        loginId: "아이디",
+        password: "비밀번호",
+        nickname: "닉네임",
+        userName: "이름",
+        phoneNum: "전화번호",
+        birth: "생년월일",
+        email: "이메일",
+        addr: "주소"
+    };
+
 
     const handleCheckEmail = () => {
     checkDuplicateEmail(user.email).then((exists) => {
@@ -46,13 +57,28 @@ export default function SignUpPage() {
 
 
     const handleSign = () => {
-         signUp(user)
-      .then(() => {
-        alert("회원가입이 완료되었습니다!");
-        navigate("/login", { replace: true });
-      })
-      .catch(() => setToastOpen(true));
+        const missingFields = Object.entries(user)
+        .filter(([_, value]) => !value)
+        .map(([key]) => fieldLabels[key as keyof User]);
 
+        if (missingFields.length > 0) {
+            alert(`${missingFields.join(", ")}을 작성해주세요`);
+            return;
+        }
+
+         if (emailCheck !== false || nicknameCheck !== false) {
+            alert("이메일과 닉네임의 중복 확인을 먼저 해주세요.");
+            return;
+        }
+
+        signUp(user)
+            .then(() => {
+            alert("회원가입 성공!");
+            navigate("/login");
+            })
+            .catch(() => {
+            alert("회원가입에 실패했습니다.");
+            });
     }
 
     return(
