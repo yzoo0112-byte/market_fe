@@ -21,19 +21,19 @@ export default function PostWrite() {
       formData.append("files", files);
     });
 
-    // try {
-    //   const res = await fetch("http://localhost:5173/posts", {
-    //     method: "POST",
-    //     body: formData,
-    //   });
+    try {
+      const res = await fetch("http://localhost:8080/posts", {
+        method: "POST",
+        body: formData,
+      });
 
-    //   const data = await res.json();
-    //   console.log("서버 응답:", data);
-    //   alert("게시글이 등록되었습니다.");
-    // } catch (err) {
-    //   console.error("에러 발생:", err);
-    //   alert("저장 중 오류가 발생했습니다.");
-    // }
+      const data = await res.json();
+      console.log("서버 응답:", data);
+      alert("게시글이 등록되었습니다.");
+    } catch (err) {
+      console.error("에러 발생:", err);
+      alert("저장 중 오류가 발생했습니다.");
+    }
   };
 
   const handleCancel = () => {
