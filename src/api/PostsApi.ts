@@ -1,22 +1,27 @@
-import axios from 'axios';
+import { PostForm } from "./type";
 
-type Posts = {
-    id: number;
-    nickName: string;
-    title: string;
-    content: string;
-    createAt: string;
-    updateAt: string;
-    views: number;
-    hashtage: string;
-}
+export async function createPost(post: PostForm): Promise<any> {
+  const formData = new FormData();
+  formData.append("title", post.title);
+  formData.append("hashtags", post.hashtags);
+  formData.append("content", post.content);
+  post.files.forEach((file) => {
+    formData.append("files", file);
+  });
 
-export const getPostId = async (id: number): Promise<Posts> => {
-    const response = await axios.get(`/api/post/${id}`)
-    return response.data
-}
+  try {
+    const response = await fetch("http://localhost:8080/api/posts", {
+      method: "POST",
+      body: formData,
+    });
 
-export const deletePost = async (id: number): Promise<number> => {
-    const response = await axios.delete(`/api/post/${id}`);
-    return response.data
+    if (!response.ok) {
+      throw new Error("서버 응답 실패");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("게시글 등록 오류:", error);
+    throw error;
+  }
 }
