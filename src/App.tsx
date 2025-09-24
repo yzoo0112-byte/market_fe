@@ -7,9 +7,10 @@ import SignUpPage from './pages/SignUpPage'
 import Header from './pages/Header'
 import MyPage from './pages/MyPage'
 import PostPage from './page/PostPage'
+import PostWrite from "./pages/PostWrite";
+
 
 export default function App() {
-
   return (
     <>
       <Container maxWidth='xl'>
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/login" element={<Login/>} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/post/:id" element={<PostPage />} />
+          <Route path="/posts" element={<PostWrite />} />
         </Routes>
       </Container>
     </>
