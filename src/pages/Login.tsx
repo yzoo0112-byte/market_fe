@@ -10,7 +10,7 @@ import { getAuthToken } from "../api/LoginApi";
 export default function  Login(){
 
     const navigate = useNavigate();
-    const {login} = useAuthStore();
+    const { login} = useAuthStore();
     const [toastOpen, setToastOpen] = useState(false);
     const [user, setUser] = useState<LoginUser>({
         loginId: '',
@@ -27,15 +27,20 @@ export default function  Login(){
 
 
     const handleLogin = () => {
+        if (!user.loginId || !user.password) {
+            alert("아이디와 비밀번호를 모두 입력해주세요.");
+            return; 
+        }
+
         getAuthToken(user)
-      .then((token) => {
-        sessionStorage.setItem("jwt", token);
-        login();
-        navigate("/");
+            .then((token) => {
+                sessionStorage.setItem("jwt", token);
+                login();
+                navigate("/");
       })
       .catch(() => {
-        setUser({ ...user, password: "" }); // 비밀번호 초기화
-        //setToastOpen(true); // 실패 메시지
+        setUser({ ...user, password: "" }); 
+        setToastOpen(true); 
       });
 
 

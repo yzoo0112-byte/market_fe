@@ -57,19 +57,20 @@ export default function SignUpPage() {
 
 
     const handleSign = () => {
-        const missingFields = Object.entries(user)
-        .filter(([_, value]) => !value)
-        .map(([key]) => fieldLabels[key as keyof User]);
+        const missingFields = (Object.keys(user) as (keyof User)[])
+            .filter((key) => !user[key])
+            .map((key) => fieldLabels[key]);
 
         if (missingFields.length > 0) {
             alert(`${missingFields.join(", ")}을 작성해주세요`);
             return;
         }
 
-         if (emailCheck !== false || nicknameCheck !== false) {
+        if (emailCheck === null || nicknameCheck === null) {
             alert("이메일과 닉네임의 중복 확인을 먼저 해주세요.");
             return;
         }
+
 
         signUp(user)
             .then(() => {
@@ -84,7 +85,7 @@ export default function SignUpPage() {
     return(
         <>
         <Stack spacing={2} mt={2} alignItems={"center"}>
-            <Typography>회원가입</Typography>
+            <Typography>회원가입 페이지</Typography>
             <TextField 
                 label="ID"
                 name="loginId"

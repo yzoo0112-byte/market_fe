@@ -17,11 +17,11 @@ export const signUp = async (user: User): Promise<User> => {
 }
 
 export const checkDuplicateEmail = async (email: string): Promise<boolean> => {
-  const res = await axios.get("/api/echeck", { params: { email }});
+  const res = await axios.get("/api/signup/echeck", { params: { email }});
   return res.data; // true면 중복됨, false면 사용 가능
 };
 
 export const checkDuplicateNickname = async (nickname: string): Promise<boolean> => {
-  const res = await axios.get("/api/ncheck", {params: { nickname }});
+  const res = await axios.get("/api/signup/ncheck", {params: { nickname }});
   return res.data;
 };

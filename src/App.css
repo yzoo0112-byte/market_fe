@@ -2,21 +2,44 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  flex: 1; /* 왼쪽 공간 확보 */
+  font-size: 24px;
+  font-weight: bold;
+  padding: 0;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+}
+
+
+.nav-right button {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
 
 @keyframes logo-spin {
   from {
