@@ -2,7 +2,7 @@ import axios from 'axios';
 
 type Posts = {
     id: number;
-    userId: number;
+    nickName: string;
     title: string;
     content: string;
     createAt: string;

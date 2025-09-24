@@ -5,7 +5,7 @@ import { deletePost, getPostId } from "../api/PostsApi";
 
 type Posts = {
     id: number;
-    userId: number;
+    nickName: string;
     title: string;
     content: string;
     createAt: string;
@@ -65,7 +65,7 @@ export default function PostPage() {
                     {/* 작성일(수정일) */}
                     {/* 조회수 */}
                     <Box sx={{ mt: 2, fontSize: 14, color: "gray" }}>
-                        글번호: {post.id} | 작성자 ID: {post.userId} | 작성일: {post.createAt} | 수정일: {post.updateAt} | 조회수: {post.views}
+                        글번호: {post.id} | 작성자 : {post.nickName} | 작성일: {post.createAt} | 수정일: {post.updateAt} | 조회수: {post.views}
                     </Box>
 
                     {/* 해시태그 */}
