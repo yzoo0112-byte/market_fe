@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import { Badge, Box, Button, Container, Typography } from "@mui/material";
-import { deletePost, getPostId } from "../api/PostsApi";
+import { deletePost, getPostId } from "../api/postsApi";
+
 
 type Posts = {
     id: number;

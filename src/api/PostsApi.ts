@@ -1,4 +1,7 @@
-import { PostForm } from "./type";
+import type { PostForm } from "../type";
+import axios from "axios";
+
+
 
 export async function createPost(post: PostForm): Promise<any> {
   const formData = new FormData();
@@ -24,4 +27,27 @@ export async function createPost(post: PostForm): Promise<any> {
     console.error("게시글 등록 오류:", error);
     throw error;
   }
+
 }
+
+// 게시글 상세 조회
+export const getPostId = async (id: number) => {
+  const token = sessionStorage.getItem("jwt");
+  const res = await axios.get(`/api/posts/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data; // 서버가 { ...post } 형태로 응답한다고 가정
+};
+
+// 게시글 삭제
+export const deletePost = async (id: number) => {
+  const token = sessionStorage.getItem("jwt");
+  await axios.delete(`/api/posts/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+

@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import SignUpPage from './pages/SignUpPage'
 import Header from './pages/Header'
 import MyPage from './pages/MyPage'
-import PostPage from './page/PostPage'
+import PostPage from './pages/PostPage'
 import PostWrite from "./pages/PostWrite";
 import TableView from './components/TableView'
 import { SearchProvider } from './contexts/SearchProvider'
@@ -15,34 +15,31 @@ import { SearchProvider } from './contexts/SearchProvider'
 
 export default function App() {
   return (
-    <>
-      <Container maxWidth='xl'>
+    <BrowserRouter>
+      <SearchProvider>
         <CssBaseline />
-        <AppBar position="fixed"  color="transparent" elevation={0}>
+        <AppBar position="fixed" color="transparent" elevation={0}>
           <Toolbar>
-            <Typography variant="h6" >
+            <Typography variant="h6">
               <Header />
             </Typography>
           </Toolbar>
         </AppBar>
-        <SearchProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/signup" element={<SignUpPage />} />
-              <Route path="/login" element={<Login/>} />
-              <Route path="/mypage" element={<MyPage />} />
-              <Route path="/post/:id" element={<PostPage />} />
-              <Route path="/posts" element={<PostWrite />} />
-              <Route path="/" element={<TableView />} />
-            </Routes>
-          </BrowserRouter>
-        </SearchProvider>
-      </Container>
-    </>
 
-    
-
-  )
+        {/* ✅ AppBar 높이만큼 여백 확보 */}
+        <Toolbar />
+        <Container maxWidth="xl">
+          <Routes>
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/post/:id" element={<PostPage />} />
+            <Route path="/posts" element={<PostWrite />} />
+            <Route path="/" element={<TableView />} />
+          </Routes>
+        </Container>
+      </SearchProvider>
+    </BrowserRouter>
+  );
 }
-
 
