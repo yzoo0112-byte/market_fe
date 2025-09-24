@@ -6,6 +6,7 @@ import { Route, Routes } from 'react-router-dom'
 import SignUpPage from './pages/SignUpPage'
 import Header from './pages/Header'
 import MyPage from './pages/MyPage'
+import PostPage from './page/PostPage'
 
 export default function App() {
 
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<Login/>} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/post/:id" element={<PostPage />} />
         </Routes>
       </Container>
     </>
