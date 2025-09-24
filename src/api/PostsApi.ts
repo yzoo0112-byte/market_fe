@@ -6,7 +6,7 @@ import axios from "axios";
 export async function createPost(post: PostForm): Promise<any> {
     const formData = new FormData();
     formData.append("title", post.title);
-    formData.append("hashtags", post.hashtag);
+    formData.append("hashtag", post.hashtag);
     formData.append("content", post.content);
     post.files.forEach((file) => {
         formData.append("files", file);
@@ -32,22 +32,18 @@ export async function createPost(post: PostForm): Promise<any> {
 
 // 게시글 상세 조회
 export const getPostId = async (id: number) => {
-    const token = sessionStorage.getItem("jwt");
-    const res = await axios.get(`/api/posts/${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-    return res.data; // 서버가 { ...post } 형태로 응답한다고 가정
+
+    const response = await axios.get(`/api/post/${id}`
+    );
+    return response.data; // 서버가 { ...post } 형태로 응답한다고 가정
 };
 
 // 게시글 삭제
 export const deletePost = async (id: number) => {
-    const token = sessionStorage.getItem("jwt");
-    await axios.delete(`/api/posts/${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+
+    const response = await axios.delete(`/api/post/${id}`
+
+    );
+    return response.data;
 };
 

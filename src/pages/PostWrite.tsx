@@ -153,7 +153,7 @@ import {
 
 export default function PostWrite() {
   const [title, setTitle] = useState("");
-  const [hashtags, setHashtags] = useState("");
+  const [hashtag, setHashtags] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
 
@@ -166,14 +166,14 @@ export default function PostWrite() {
   const handleSave = async () => {
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("hashtags", hashtags);
+    formData.append("hashtag", hashtag);
     formData.append("content", content);
     files.forEach((file) => {
       formData.append("files", file);
     });
 
     try {
-      const res = await fetch("http://localhost:8080/posts", {
+      const res = await fetch("http://localhost:8080/post", {
         method: "POST",
         body: formData,
       });
@@ -220,7 +220,7 @@ export default function PostWrite() {
             <Grid item xs={12}>
               <TextField
                 label="해시태그"
-                value={hashtags}
+                value={hashtag}
                 onChange={(e) => setHashtags(e.target.value)}
                 placeholder="예: #프로젝트, #공지, #노션"
                 fullWidth
