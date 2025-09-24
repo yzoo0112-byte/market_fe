@@ -139,9 +139,6 @@
 // }
 import { useState } from "react";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Button,
   TextField,
   Container,
@@ -202,21 +199,7 @@ export default function PostWrite() {
   return (
     <Box>
       {/* 상단바 */}
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography variant="h6" color="primary" fontWeight="bold">
-            로고
-          </Typography>
-          <TextField
-            placeholder="검색어를 입력하세요"
-            size="small"
-            sx={{ width: "40%" }}
-          />
-          <Button variant="contained" color="primary">
-            로그인/로그아웃
-          </Button>
-        </Toolbar>
-      </AppBar>
+
 
       {/* 본문 */}
       <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
@@ -265,7 +248,7 @@ export default function PostWrite() {
                 <Button
                   variant="outlined"
                   component="label"
-                  // startIcon={<UploadFile />}
+                // startIcon={<UploadFile />}
                 >
                   파일 업로드
                   <input

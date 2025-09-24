@@ -34,7 +34,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/post/:id" element={<PostPage />} />
-            <Route path="/posts" element={<PostWrite />} />
+            <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
           </Routes>
         </Container>
