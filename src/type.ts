@@ -7,7 +7,6 @@ export type User = {
     birth: string;
     email: string;
     addr: string;
-
 }
 
 export type LoginUser = {

@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import { Route, Routes } from 'react-router-dom'
 import SignUpPage from './pages/SignUpPage'
 import Header from './pages/Header'
+import MyPage from './pages/MyPage'
 
 export default function App() {
 
@@ -20,10 +21,9 @@ export default function App() {
           </Toolbar>
         </AppBar>
         <Routes>
-          {/* <Route path="/signup" element={<MyPage />} /> */}
-          {/* <Route path="/" element={<Header />} /> */}
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<Login/>} />
+          <Route path="/mypage" element={<MyPage />} />
         </Routes>
       </Container>
     </>

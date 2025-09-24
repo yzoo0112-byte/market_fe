@@ -100,10 +100,10 @@ export default function SignUpPage() {
                 onChange={handleChange}
             />
             <TextField
-            label="이메일"
-            name="email"
-            value={user.email}
-            onChange={handleChange}
+                label="이메일"
+                name="email"
+                value={user.email}
+                onChange={handleChange}
             />
 
             <Button onClick={handleCheckEmail}>중복 확인</Button>
