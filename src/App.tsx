@@ -2,12 +2,15 @@
 import { AppBar, Container, CssBaseline, Toolbar, Typography } from '@mui/material'
 import './App.css'
 import Login from './pages/Login'
-import { Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import SignUpPage from './pages/SignUpPage'
 import Header from './pages/Header'
 import MyPage from './pages/MyPage'
 import PostPage from './page/PostPage'
 import PostWrite from "./pages/PostWrite";
+import TableView from './components/TableView'
+import { SearchProvider } from './contexts/SearchProvider'
+
 
 
 export default function App() {
@@ -22,15 +25,23 @@ export default function App() {
             </Typography>
           </Toolbar>
         </AppBar>
-        <Routes>
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/login" element={<Login/>} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/post/:id" element={<PostPage />} />
-          <Route path="/posts" element={<PostWrite />} />
-        </Routes>
+        <SearchProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<Login/>} />
+              <Route path="/mypage" element={<MyPage />} />
+              <Route path="/post/:id" element={<PostPage />} />
+              <Route path="/posts" element={<PostWrite />} />
+              <Route path="/" element={<TableView />} />
+            </Routes>
+          </BrowserRouter>
+        </SearchProvider>
       </Container>
     </>
+
+    
+
   )
 }
 
