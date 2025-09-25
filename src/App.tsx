@@ -13,9 +13,11 @@ import { SearchProvider } from './contexts/SearchProvider'
 
 
 
+
 export default function App() {
   return (
     <BrowserRouter>
+    {/* <AuthProvider> */}
       <SearchProvider>
         <CssBaseline />
         <AppBar position="fixed" color="transparent" elevation={0}>
@@ -34,11 +36,12 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/post/:id" element={<PostPage />} />
-            <Route path="/posts" element={<PostWrite />} />
+            <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
           </Routes>
         </Container>
       </SearchProvider>
+      {/* </AuthProvider> */}
     </BrowserRouter>
   );
 }

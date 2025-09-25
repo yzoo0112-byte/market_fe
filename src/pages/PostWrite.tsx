@@ -137,7 +137,9 @@
 //     </div>
 //   );
 // }
-import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState, } from "react";
 import {
   AppBar,
   Toolbar,
@@ -155,10 +157,22 @@ import {
 } from "@mui/material";
 
 export default function PostWrite() {
+  
+
   const [title, setTitle] = useState("");
-  const [hashtags, setHashtags] = useState("");
+  const [hashtag, setHashtags] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const navigate = useNavigate();
+
+useEffect(() => {
+  const token = sessionStorage.getItem("jwt");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    navigate("/login");
+  }
+}, []);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -169,17 +183,24 @@ export default function PostWrite() {
   const handleSave = async () => {
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("hashtags", hashtags);
+    formData.append("hashtag", hashtag);
     formData.append("content", content);
     files.forEach((file) => {
       formData.append("files", file);
+      formData.append("userId", sessionStorage.getItem("userId")!);
+
     });
 
     try {
-      const res = await fetch("http://localhost:8080/posts", {
+      const res = await fetch("http://localhost:8080/post", {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `${sessionStorage.getItem("jwt")}`, // JWT 토큰 포함
+        },
       });
+
+      if (!res.ok) throw new Error("서버 오류");
 
       const data = await res.json();
       console.log("서버 응답:", data);
@@ -237,7 +258,7 @@ export default function PostWrite() {
             <Grid item xs={12}>
               <TextField
                 label="해시태그"
-                value={hashtags}
+                value={hashtag}
                 onChange={(e) => setHashtags(e.target.value)}
                 placeholder="예: #프로젝트, #공지, #노션"
                 fullWidth
@@ -262,11 +283,7 @@ export default function PostWrite() {
             {/* 첨부파일 */}
             <Grid item xs={12}>
               <Box display="flex" alignItems="center" gap={2}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                  // startIcon={<UploadFile />}
-                >
+                <Button variant="outlined" component="label">
                   파일 업로드
                   <input
                     type="file"
@@ -287,7 +304,7 @@ export default function PostWrite() {
                           setFiles(files.filter((_, i) => i !== idx))
                         }
                       >
-                        {/* <Cancel color="error" /> */}
+                        {/* 삭제 아이콘 */}
                       </IconButton>
                     }
                   >

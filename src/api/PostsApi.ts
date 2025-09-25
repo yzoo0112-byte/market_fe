@@ -6,14 +6,14 @@ import axios from "axios";
 export async function createPost(post: PostForm): Promise<any> {
   const formData = new FormData();
   formData.append("title", post.title);
-  formData.append("hashtags", post.hashtags);
+  formData.append("hashtag", post.hashtags);
   formData.append("content", post.content);
   post.files.forEach((file) => {
     formData.append("files", file);
   });
 
   try {
-    const response = await fetch("http://localhost:8080/api/posts", {
+    const response = await fetch("http://localhost:8080/api/post", {
       method: "POST",
       body: formData,
     });
