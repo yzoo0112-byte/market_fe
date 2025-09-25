@@ -5,7 +5,6 @@
 }
 
 .logo {
-  flex: 1; /* 왼쪽 공간 확보 */
   font-size: 24px;
   font-weight: bold;
   padding: 0;
