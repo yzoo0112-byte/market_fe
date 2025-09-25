@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import { Badge, Box, Button, Container, Typography } from "@mui/material";
-import { deletePost, getPostId } from "../api/postsApi";
+import { deletePost } from "../api/postsApi";
+import { getPostById } from "../api/TestApi"    
+import type { ViewPost } from "../types";
 
 
 type Posts = {
@@ -17,13 +19,22 @@ type Posts = {
 }
 
 export default function PostPage() {
-    const [post, setPost] = useState<Posts | null>(null);
+    const [post, setPost] = useState<ViewPost | null>(null);
     const { id } = useParams();
-    useEffect(() => {
-        if (id) {
-            getPostId(Number(id)).then(setPost).catch(console.error);
-        }
-    }, [id]);
+
+
+
+    //메인페이지 목록 리스트에서 클릭 시 해당 id에 관한 정보 백엔드에서 가져오기 
+     useEffect(() => {
+    if (!id) return;
+    getPostById(Number(id)).then((data) => {
+      setPost(data);
+    });
+  }, [id]);
+
+
+
+
 
     const handleDelete = async () => {
         if (!id) return

@@ -1,11 +1,13 @@
-import { createContext } from 'react';
+import { createContext,  type Dispatch, type SetStateAction } from "react";
 
 interface SearchContextType {
   keyword: string;
-  setKeyword: (k: string) => void;
+  setKeyword: Dispatch<SetStateAction<string>>;
 }
 
 export const SearchContext = createContext<SearchContextType>({
-  keyword: '',
+  keyword: "",
   setKeyword: () => {},
 });
+
+
