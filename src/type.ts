@@ -39,8 +39,8 @@ export type Comment = {
   postId: number;
   nickname?: string;
   comment: string;
-  createAt: Date;
-  updateAt?: Date;
+  createdAt: Date;
+  updatedAt?: Date;
 }
 
 // 댓글 작성자 정보

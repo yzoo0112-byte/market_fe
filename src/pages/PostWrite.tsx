@@ -162,6 +162,8 @@ export default function PostWrite() {
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
 
+
+
   useEffect(() => {
     const token = sessionStorage.getItem("jwt");
     if (!token) {
