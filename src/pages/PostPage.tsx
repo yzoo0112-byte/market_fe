@@ -5,6 +5,8 @@ import type { Comment, Post } from "../type";
 import { deletePost, getPostId } from "../api/postsApi";
 import { createComment, getComment } from "../api/CommentApi";
 import { useUserStore } from "../store";
+import type { ViewPost } from "../types";
+import { getPostById } from "../api/TestApi";
 
 export default function PostPage() {
     const { id } = useParams();
@@ -43,6 +45,16 @@ export default function PostPage() {
             fetchPostData();
         }
     }, [])
+
+    const [viewpost, setViewPost] = useState<ViewPost | null>(null);
+
+    //메인페이지 목록 리스트에서 클릭 시 해당 id에 관한 정보 백엔드에서 가져오기 
+    useEffect(() => {
+        if (!id) return;
+        getPostById(Number(id)).then((data) => {
+            setViewPost(data);
+        });
+    }, [id]);
 
     // 게시글 삭제
     const handleDelete = async () => {

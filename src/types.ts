@@ -6,6 +6,6 @@ export type ViewPost = {
     views: number
     create_at: string
     update_at: string
-    hashtag?: string
+    hashtag?: string[]
 }
 
