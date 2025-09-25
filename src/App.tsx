@@ -13,9 +13,11 @@ import { SearchProvider } from './contexts/SearchProvider'
 
 
 
+
 export default function App() {
   return (
     <BrowserRouter>
+    {/* <AuthProvider> */}
       <SearchProvider>
         <CssBaseline />
         <AppBar position="fixed" color="transparent" elevation={0}>
@@ -39,6 +41,7 @@ export default function App() {
           </Routes>
         </Container>
       </SearchProvider>
+      {/* </AuthProvider> */}
     </BrowserRouter>
   );
 }
