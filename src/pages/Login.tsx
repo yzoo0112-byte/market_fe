@@ -28,10 +28,11 @@ export default function Login() {
       return;
     }
     getAuthToken(user)
-      .then((token) => {
-        sessionStorage.setItem("jwt", token);
-        login();
-        navigate("/post");
+      .then((res) => {
+        sessionStorage.setItem("userId", res.userId);
+        sessionStorage.setItem("nickname", res.nickname);
+        login(res);
+        navigate("/");
       })
       .catch(() => {
         setUser({ ...user, password: "" });

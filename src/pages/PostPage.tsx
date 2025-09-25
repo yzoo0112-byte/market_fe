@@ -4,13 +4,13 @@ import { useParams } from "react-router-dom";
 import type { Comment, Post } from "../type";
 import { deletePost, getPostId } from "../api/postsApi";
 import { createComment, getComment } from "../api/CommentApi";
-import { useUserStore } from "../store";
+import { useAuthStore } from "../store";
 import type { ViewPost } from "../types";
 import { getPostById } from "../api/TestApi";
 
 export default function PostPage() {
     const { id } = useParams();
-    const { userInfo, isAuthenticated } = useUserStore
+    const { userInfo, isAuthenticated } = useAuthStore();
     const [post, setPost] = useState<Post>({
         postId: 0,
         userId: 0,
