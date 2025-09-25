@@ -1,9 +1,6 @@
 
 import { useState } from "react";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Button,
   TextField,
   Container,
@@ -14,6 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -65,125 +63,82 @@ export default function PostWrite() {
   };
 
   return (
-    <Box>
-      {/* 상단바 */}
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography variant="h6" color="primary" fontWeight="bold">
-            로고
-          </Typography>
-          <TextField
-            placeholder="검색어를 입력하세요"
-            size="small"
-            sx={{ width: "40%" }}
-          />
-          <Button variant="contained" color="primary">
-            로그인/로그아웃
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <>
+      <Typography>
+        게시글 작성 페이지
+      </Typography>
+      <Container maxWidth="sm" sx={{ mt: 6, mb: 6 }}>
+  <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
+    <Box display="flex" flexDirection="column" gap={3}>
+      {/* 제목 */}
+      <TextField
+        label="제목"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        fullWidth
+        variant="outlined"
+      />
+
+      {/* 해시태그 */}
+      <TextField
+        label="해시태그"
+        value={hashtags}
+        onChange={(e) => setHashtags(e.target.value)}
+        placeholder="예: #프로젝트, #공지, #노션"
+        fullWidth
+        variant="outlined"
+        helperText="쉼표(,)로 구분하여 입력"
+      />
 
       {/* 본문 */}
-      <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
-        <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
-          <Grid container spacing={4}>
-            {/* 제목 */}
-            <Grid item xs={12}>
-              <TextField
-                label="제목"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
+      <TextField
+        label="본문 내용"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        multiline
+        rows={8}
+        fullWidth
+        variant="outlined"
+      />
 
-            {/* 해시태그 */}
-            <Grid item xs={12}>
-              <TextField
-                label="해시태그"
-                value={hashtags}
-                onChange={(e) => setHashtags(e.target.value)}
-                placeholder="예: #프로젝트, #공지, #노션"
-                fullWidth
-                variant="outlined"
-                helperText="쉼표(,)로 구분하여 입력"
-              />
-            </Grid>
-
-            {/* 본문 */}
-            <Grid item xs={12}>
-              <TextField
-                label="본문 내용"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                multiline
-                rows={8}
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
-
-            {/* 첨부파일 */}
-            <Grid item xs={12}>
-              <Box display="flex" alignItems="center" gap={2}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                  // startIcon={<UploadFile />}
+      {/* 첨부파일 */}
+      <Box>
+        <Button variant="outlined" component="label">
+          파일 업로드
+          <input type="file" multiple hidden onChange={handleFileChange} />
+        </Button>
+        <List dense>
+          {files.map((file, idx) => (
+            <ListItem
+              key={idx}
+              secondaryAction={
+                <IconButton
+                  edge="end"
+                  onClick={() => setFiles(files.filter((_, i) => i !== idx))}
                 >
-                  파일 업로드
-                  <input
-                    type="file"
-                    multiple
-                    hidden
-                    onChange={handleFileChange}
-                  />
-                </Button>
-              </Box>
-              <List dense>
-                {files.map((file, idx) => (
-                  <ListItem
-                    key={idx}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        onClick={() =>
-                          setFiles(files.filter((_, i) => i !== idx))
-                        }
-                      >
-                        {/* <Cancel color="error" /> */}
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText primary={file.name} />
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
+                  {/* <Cancel color="error" /> */}
+                </IconButton>
+              }
+            >
+              <ListItemText primary={file.name} />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
 
-            {/* 버튼 */}
-            <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                sx={{ px: 4 }}
-              >
-                등록
-              </Button>
-              <Button
-                variant="outlined"
-                color="inherit"
-                onClick={handleCancel}
-                sx={{ px: 4 }}
-              >
-                취소
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Container>
+      {/* 버튼 */}
+      <Box display="flex" justifyContent="flex-end" gap={2}>
+        <Button variant="contained" color="primary" onClick={handleSave} sx={{ px: 4 }}>
+          등록
+        </Button>
+        <Button variant="outlined" color="inherit" onClick={handleCancel} sx={{ px: 4 }}>
+          취소
+        </Button>
+      </Box>
     </Box>
+  </Paper>
+</Container>
+
+    </>
   );
 }
