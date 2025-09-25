@@ -46,15 +46,6 @@ export default function PostPage() {
         }
     }, [])
 
-    const [viewpost, setViewPost] = useState<ViewPost | null>(null);
-
-    //메인페이지 목록 리스트에서 클릭 시 해당 id에 관한 정보 백엔드에서 가져오기 
-    useEffect(() => {
-        if (!id) return;
-        getPostById(Number(id)).then((data) => {
-            setViewPost(data);
-        });
-    }, [id]);
 
     // 게시글 삭제
     const handleDelete = async () => {
@@ -82,7 +73,7 @@ export default function PostPage() {
             postId: Number(id),
             comment: commentText,
             nickname: userInfo.nickname,
-            createAt: new Date()
+            createdAt: new Date()
         };
 
         try {
@@ -103,15 +94,16 @@ export default function PostPage() {
                 {/* 삭제버튼 */}
                 <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
                     <Typography variant="h4">{post.title}</Typography>
-
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={handleDelete}
-                    >
-                        삭제
-                    </Button>
-
+                    {/* 유효하지 않은 유저는 삭제버튼 비활성화 */}
+                    {isAuthenticated && (
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={handleDelete}
+                        >
+                            삭제
+                        </Button>
+                    )}
                 </Box>
                 {/* <img src={`??`} alt="게시글 이미지" style={{ width: "100%" }} /> */}
                 <Typography variant="body1" sx={{ marginY: 2 }}>{post.content}</Typography>
@@ -120,7 +112,7 @@ export default function PostPage() {
 
                 <Box display="flex" flexDirection="column" gap={2}>
                     <TextField
-                        label="댓글을 "
+                        label="댓글"
                         name="commetn"
                         variant="outlined"
                         value={commentText}
@@ -141,8 +133,7 @@ export default function PostPage() {
                         comment.map((comment, index) => (
                             <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: '4px' }}>
                                 <Typography variant="subtitle2" color="text.secondary">
-                                    {/* 댓글 작성자 표시. 백엔드에서 member 엔티티의 이름 등을 가져와야 합니다. */}
-                                    {comment.nickname ? comment.nickname : "익명"}
+                                    {comment.nickname}
                                 </Typography>
                                 <Typography variant="body1">
                                     {comment.comment}
