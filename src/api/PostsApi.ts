@@ -35,8 +35,11 @@ export const getPostId = async (id: number) => {
 
     const response = await axios.get(`/api/post/${id}`
     );
-    return response.data; // 서버가 { ...post } 형태로 응답한다고 가정
+    console.log(response.data)
+    return response.data;
+
 };
+
 
 // 게시글 삭제
 export const deletePost = async (id: number) => {

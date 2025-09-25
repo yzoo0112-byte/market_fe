@@ -1,315 +1,151 @@
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-    Container, Typography, Button, Paper, Table, TableHead, TableRow, TableCell,
-    TableBody, IconButton, TextField
-} from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import type { Comment, Post } from "../type";
 import { deletePost, getPostId } from "../api/postsApi";
-
-type Attachment = {
-    id: number;
-    originalName: string;
-    size: string;
-    downloadCount: number;
-    downloadUrl: string;
-};
-
-type Comment = {
-    id: number;
-    userId: number;
-    author: string;
-    content: string;
-    createdAt: string;
-    updatedAt?: string;
-    likes: number;
-    liked: boolean;
-};
-
-
-type Posts = {
-    id: number;
-    nickName: string;
-    title: string;
-    content: string;
-    createAt: string;
-    updateAt: string;
-    views: number;
-    hashtage: string;
-    images?: string[];
-    attachments?: Attachment[];
-};
+import { createComment, getComment } from "../api/CommentApi";
+import { useUserStore } from "../store";
 
 export default function PostPage() {
     const { id } = useParams();
-    const [post, setPost] = useState<Posts | null>(null);
-    const [showAttachments, setShowAttachments] = useState(false);
-    const [liked, setLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(0);
-    const [comments, setComments] = useState<Comment[]>([]);
-    const [newComment, setNewComment] = useState("");
-    const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
-    const [editContent, setEditContent] = useState("");
+    const { userInfo, isAuthenticated } = useUserStore
+    const [post, setPost] = useState<Post>({
+        postId: 0,
+        userId: 0,
+        title: "",
+        content: "",
+        createAt: new Date(),
+        updateAt: new Date(),
+        views: 0,
+        hashtag: "",
+        fileList: []
+    });
 
+    //댓글 내용
+    const [commentText, setCommentText] = useState("");
+    //댓글 리스트
+    const [comment, setComment] = useState<Comment[]>([]);
+
+    const fetchPostData = async () => {
+        try {
+            const postResponse = await getPostId(Number(id));
+            setPost(postResponse);
+
+            const commentResponse = await getComment(Number(id));
+            setComment(commentResponse);
+        } catch (error) {
+            console.error("데이터 로딩 실패", error);
+        }
+    };
 
     useEffect(() => {
         if (id) {
-            getPostId(Number(id))
-                .then((data) => {
-                    setPost(data);
-                    setLikeCount(123); // 예시값
-                    setComments([]);   // 댓글 API 연결 시 교체
-                })
-                .catch(console.error);
+            fetchPostData();
         }
-    }, [id]);
+    }, [])
 
+    // 게시글 삭제
     const handleDelete = async () => {
         if (!id) return;
+
         const confirmDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
         if (!confirmDelete) return;
 
         try {
             await deletePost(Number(id));
             alert("게시글이 삭제되었습니다.");
-            window.location.href = "/";
+            window.location.href = "/"; // 홈으로 리디렉션
         } catch (error) {
             alert("삭제 실패");
             console.error(error);
         }
-    };
 
-    const handleLikeToggle = () => {
-        setLiked((prev) => !prev);
-        setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
-    };
+    }
 
-    const handleAddComment = () => {
-        if (!newComment.trim()) return;
-        const newItem: Comment = {
-            id: Date.now(),
-            author: "현재유저", // 로그인 유저 이름
-            content: newComment,
-            createdAt: new Date().toISOString(),
-            likes: 0,
-            liked: false,
+    // 댓글 작성
+    const handleSubmit = async () => {
+        if (!commentText || !userInfo) return;
+
+        const commentData: Comment = {
+            postId: Number(id),
+            comment: commentText,
+            nickname: userInfo.nickname,
+            createAt: new Date()
         };
-        setComments((prev) => [...prev, newItem]);
-        setNewComment("");
+
+        try {
+            await createComment(commentData);
+            setCommentText("");
+            fetchPostData();
+            alert("댓글이 성공적으로 등록되었습니다!");
+        } catch (error) {
+            alert("댓글 등록 실패");
+            console.error(error);
+        }
     };
 
-    const handleCommentLike = (id: number) => {
-        setComments((prev) =>
-            prev.map((c) =>
-                c.id === id
-                    ? {
-                        ...c,
-                        liked: !c.liked,
-                        likes: c.liked ? c.likes - 1 : c.likes + 1,
-                    }
-                    : c
-            )
-        );
-    };
-
-    const handleCommentEdit = (id: number, newContent: string) => {
-        setComments((prev) =>
-            prev.map((c) =>
-                c.id === id ? { ...c, content: newContent, updatedAt: new Date().toISOString() } : c
-            )
-        );
-    };
 
     return (
         <>
-            {post ? (
-                <div className="max-w-3xl mx-auto px-4 py-6">
-                    {/* 제목, 작성자 정보 */}
-                    <Typography variant="h4" className="font-bold">{post.title}</Typography>
-                    <div className="text-sm text-gray-600 mt-2">
-                        작성자: {post.nickName} · 작성일: {post.createAt} {post.updateAt && `(수정됨: ${post.updateAt})`} · 조회수: {post.views} · 좋아요: {likeCount}
-                    </div>
-                    <div className="flex justify-end mt-2">
-                        <Button variant="outlined" onClick={() => setShowAttachments((prev) => !prev)}>첨부파일 보기</Button>
-                        <Button variant="text" color="error" onClick={handleDelete}>삭제</Button>
-                    </div>
+            <Container maxWidth="sm">
+                {/* 삭제버튼 */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
+                    <Typography variant="h4">{post.title}</Typography>
 
-                    {/* 첨부파일 테이블 */}
-                    {showAttachments && post.attachments && (
-                        <Paper className="my-4">
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>파일명</TableCell>
-                                        <TableCell>크기</TableCell>
-                                        <TableCell>다운로드 횟수</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {post.attachments.map((file) => (
-                                        <TableRow key={file.id} className="cursor-pointer hover:bg-gray-100" onClick={() => window.open(file.downloadUrl)}>
-                                            <TableCell>{file.originalName}</TableCell>
-                                            <TableCell>{file.size}</TableCell>
-                                            <TableCell>{file.downloadCount}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </Paper>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={handleDelete}
+                    >
+                        삭제
+                    </Button>
+
+                </Box>
+                {/* <img src={`??`} alt="게시글 이미지" style={{ width: "100%" }} /> */}
+                <Typography variant="body1" sx={{ marginY: 2 }}>{post.content}</Typography>
+                <Typography variant="h6" sx={{ mt: 4 }}></Typography>
+                {/* 댓글 입력 폼 */}
+
+                <Box display="flex" flexDirection="column" gap={2}>
+                    <TextField
+                        label="댓글을 "
+                        name="commetn"
+                        variant="outlined"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        multiline
+                        minRows={3}
+                        required
+                    />
+                    <Button variant="contained" color="primary" onClick={handleSubmit}>
+                        등록
+                    </Button>
+                </Box>
+
+
+                {/* 댓글 목록 표시 */}
+                <Box sx={{ mt: 4 }}>
+                    {comment.length > 0 ? (
+                        comment.map((comment, index) => (
+                            <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: '4px' }}>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    {/* 댓글 작성자 표시. 백엔드에서 member 엔티티의 이름 등을 가져와야 합니다. */}
+                                    {comment.nickname ? comment.nickname : "익명"}
+                                </Typography>
+                                <Typography variant="body1">
+                                    {comment.comment}
+                                </Typography>
+                            </Box>
+                        ))
+                    ) : (
+                        <Typography variant="body2" color="text.secondary">
+                            아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+                        </Typography>
                     )}
 
-                    {/* 이미지 + 본문 */}
-                    <div className="mb-6">
-                        <div className="flex flex-wrap gap-4 mb-4">
-                            {post.images?.map((img, idx) => (
-                                <img key={idx} src={img} alt={`image-${idx}`} className="max-w-full h-auto rounded shadow" />
-                            ))}
-                        </div>
-                        <div className="text-base leading-relaxed whitespace-pre-wrap">{post.content}</div>
-                    </div>
 
-                    {/* 좋아요 버튼 */}
-                    <div className="flex items-center gap-2 mb-6">
-                        <IconButton onClick={handleLikeToggle} color={liked ? "error" : "default"}>
-                            {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                        </IconButton>
-                        <span>{likeCount}</span>
-                    </div>
-
-                    {/* 댓글 입력 + 리스트 */}
-                    <div className="mt-8">
-                        <Typography variant="h6" className="mb-2">댓글</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
-                            placeholder="댓글을 입력하세요"
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                        />
-                        <Button variant="contained" className="mt-2" onClick={handleAddComment}>작성</Button>
-                        {comments.map((comment) => (
-                            <div key={comment.id} className="border p-3 rounded">
-                                <div className="text-sm text-gray-500 mb-1">
-                                    {comment.author} · {comment.createdAt} {comment.updatedAt && `(수정됨: ${comment.updatedAt})`}
-                                </div>
-
-
-                                <div className="flex items-center gap-2 mt-2">
-                                    <IconButton onClick={() => handleCommentLike(comment.id)} color={comment.liked ? "error" : "default"}>
-                                        {comment.liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                                    </IconButton>
-                                    <span>{comment.likes}</span>
-                                </div>
-                            </div>
-                        ))}
-
-                        {comments.map((comment) => (
-                            <div key={comment.id} className="border p-3 rounded">
-                                <div className="text-sm text-gray-500 mb-1">
-                                    {comment.author} · {comment.createdAt} {comment.updatedAt && `(수정됨: ${comment.updatedAt})`}
-                                </div>
-
-                                {/* 수정 버튼 조건부 렌더링 */}
-                                {(currentUser.id === comment.userId || currentUser.role === 'ADMIN') && (
-                                    <Button
-                                        size="small"
-                                        onClick={() => {
-                                            setEditingCommentId(comment.id);
-                                            setEditContent(comment.content);
-                                        }}
-                                    >
-                                        수정
-                                    </Button>
-                                )}
-
-                                {/* 수정 중일 때만 수정 폼 보여주기 */}
-                                {editingCommentId === comment.id ? (
-                                    <>
-                                        <TextField
-                                            fullWidth
-                                            multiline
-                                            value={editContent}
-                                            onChange={(e) => setEditContent(e.target.value)}
-                                        />
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            onClick={async () => {
-                                                try {
-                                                    await updateComment(comment.id, currentUser.id, editContent); // 서버 반영
-                                                    setComments((prev) =>
-                                                        prev.map((c) =>
-                                                            c.id === comment.id
-                                                                ? { ...c, content: editContent, updatedAt: new Date().toISOString() }
-                                                                : c
-                                                        )
-                                                    );
-                                                    setEditingCommentId(null); // 수정 모드 종료
-                                                } catch (error) {
-                                                    console.error("댓글 수정 실패", error);
-                                                    alert("댓글 수정에 실패했습니다.");
-                                                }
-                                            }}
-                                        >
-                                            저장
-                                        </Button>
-                                        <Button
-                                            size="small"
-                                            onClick={() => setEditingCommentId(null)}
-                                        >
-                                            취소
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        value={comment.content}
-                                        disabled
-                                    />
-                                )}
-
-                                <div className="flex items-center gap-2 mt-2">
-                                    <IconButton onClick={() => handleCommentLike(comment.id)} color={comment.liked ? "error" : "default"}>
-                                        {comment.liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                                    </IconButton>
-                                    <span>{comment.likes}</span>
-                                </div>
-                            </div>
-                        ))}
-
-
-
-                        <div className="mt-4 space-y-4">
-                            {comments.map((comment) => (
-                                <div key={comment.id} className="border p-3 rounded">
-                                    <div className="text-sm text-gray-500 mb-1">
-                                        {comment.author} · {comment.createdAt} {comment.updatedAt && `(수정됨: ${comment.updatedAt})`}
-                                    </div>
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        value={comment.content}
-                                        onChange={(e) => handleCommentEdit(comment.id, e.target.value)}
-                                    />
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <IconButton onClick={() => handleCommentLike(comment.id)} color={comment.liked ? "error" : "default"}>
-                                            {comment.liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                                        </IconButton>
-                                        <span>{comment.likes}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <Container maxWidth="md" sx={{ mt: 4, textAlign: "center" }}>
-                    <Typography variant="h6">게시글이 존재하지 않습니다.</Typography>
-                </Container>
-            )}
+                </Box>
+            </Container>
         </>
     );
 }
