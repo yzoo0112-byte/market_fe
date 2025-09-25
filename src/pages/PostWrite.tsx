@@ -15,12 +15,14 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function PostWrite() {
   const [title, setTitle] = useState("");
   const [hashtags, setHashtags] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const navigate = useNavigate();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -46,6 +48,7 @@ export default function PostWrite() {
       const data = await res.json();
       console.log("서버 응답:", data);
       alert("게시글이 등록되었습니다.");
+      navigate("/");
     } catch (err) {
       console.error("에러 발생:", err);
       alert("저장 중 오류가 발생했습니다.");
