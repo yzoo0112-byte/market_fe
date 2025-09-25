@@ -49,6 +49,42 @@ export default function MyPage() {
           setUserInfo((prev) => ({ ...prev!, nickname: e.target.value }))
         }
       />
+      <TextField
+        label="이름"
+        value={userInfo?.userName}
+        onChange={(e) =>
+          setUserInfo((prev) => ({ ...prev!, userName: e.target.value }))
+        }
+      />
+      <TextField
+        label="전화번호"
+        value={userInfo?.phoneNum}
+        onChange={(e) =>
+          setUserInfo((prev) => ({ ...prev!, phoneNum: e.target.value }))
+        }
+      />
+      <TextField
+        label="생년월일"
+        value={userInfo?.birth}
+        onChange={(e) =>
+          setUserInfo((prev) => ({ ...prev!, birth: e.target.value }))
+        }
+      />
+      <TextField
+        label="이메일"
+        value={userInfo?.email}
+        onChange={(e) =>
+          setUserInfo((prev) => ({ ...prev!, email: e.target.value }))
+        }
+      />
+      <TextField
+        label="주소"
+        value={userInfo?.addr}
+        onChange={(e) =>
+          setUserInfo((prev) => ({ ...prev!, addr: e.target.value }))
+        }
+      />
+
       {/* 다른 항목들도 동일하게 표시 및 수정 가능 */}
       <Button
         onClick={() => {
