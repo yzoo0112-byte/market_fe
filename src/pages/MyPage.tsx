@@ -1,12 +1,15 @@
 import { useState } from "react";
 import type { User } from "../type";
 import { Button, Stack, TextField, Typography } from "@mui/material";
-import { getUserInfo, updateUserInfo, verifyPassword } from "../api/MyPageApi";
+import { deleteUserAccount, getUserInfo, updateUserInfo, verifyPassword } from "../api/MyPageApi";
+import { useNavigate } from "react-router-dom";
+
 
 export default function MyPage() {
   const [step, setStep] = useState<"verify" | "view">("verify");
   const [password, setPassword] = useState("");
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   const handleVerify = () => {
     verifyPassword(password)
@@ -22,6 +25,30 @@ export default function MyPage() {
       })
       .catch(() => alert("확인 중 오류가 발생했습니다."));
   };
+
+  //회원탈퇴
+  const handleDeleteAccount = async () => {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+    navigate("/login");
+    return;
+  }
+
+  const confirmed = window.confirm("회원정보가 영구 삭제됩니다. 삭제를 원하시면 확인을 눌러주세요.");
+  if (!confirmed) return;
+
+  try {
+    await deleteUserAccount(token); // 백엔드 요청 성공
+    alert("회원탈퇴가 완료되었습니다.");
+    localStorage.removeItem("authToken"); // 로그아웃 처리
+    navigate("/");
+  } catch (error) {
+    alert("회원탈퇴 중 오류가 발생했습니다.");
+    console.error(error);
+  }
+};
+
 
   if (step === "verify") {
     return (
@@ -92,6 +119,10 @@ export default function MyPage() {
         }}
       >
         수정하기
+      </Button>
+
+            <Button color="error" onClick={handleDeleteAccount}>
+        회원탈퇴
       </Button>
     </Stack>
   );
