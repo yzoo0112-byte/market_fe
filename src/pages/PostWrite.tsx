@@ -153,7 +153,7 @@ export default function PostWrite() {
                     secondaryAction={
                       <IconButton
                         edge="end"
-                         aria-label="delete"
+                        aria-label="delete"
                         onClick={() =>
                           setFiles(files.filter((_, i) => i !== idx))
                         }
