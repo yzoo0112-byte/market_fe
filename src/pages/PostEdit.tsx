@@ -1,8 +1,5 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useState, } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   TextField,
@@ -15,84 +12,102 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
-export default function PostWrite() {
-
+export default function PostEdit() {
+  const { id } = useParams(); // 게시글 ID
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [hashtag, setHashtags] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const navigate = useNavigate();
 
-
-
+  // 로그인 확인 및 기존 게시글 불러오기
   useEffect(() => {
     const token = sessionStorage.getItem("jwt");
     if (!token) {
       alert("로그인이 필요합니다.");
       navigate("/login");
+      return;
     }
-  }, []);
 
+    // 게시글 데이터 불러오기
+    fetch(`http://localhost:8080/post/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("게시글을 불러오지 못했습니다.");
+        return res.json();
+      })
+      .then((data) => {
+        setTitle(data.title);
+        setHashtags(data.hashtag);
+        setContent(data.content);
+        // 기존 파일은 서버 URL로 관리되므로 별도 처리 필요 (예: 미리보기)
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("게시글 정보를 불러오는 중 오류가 발생했습니다.");
+      });
+  }, [id, navigate]);
 
+  // 파일 추가
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFiles([...files, ...Array.from(e.target.files)]);
     }
   };
 
-  const handleSave = async () => {
+  // 파일 삭제
+  const handleFileRemove = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+  };
+
+  // 게시글 수정 요청
+  const handleUpdate = async () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("hashtag", hashtag);
     formData.append("content", content);
     files.forEach((file) => {
       formData.append("files", file);
-      formData.append("userId", sessionStorage.getItem("userId")!);
-
     });
+    formData.append("userId", sessionStorage.getItem("userId")!);
 
     try {
-      const res = await fetch("http://localhost:8080/post", {
-        method: "POST",
+      const res = await fetch(`http://localhost:8080/post/${id}`, {
+        method: "PUT",
         body: formData,
         headers: {
-          Authorization: `${sessionStorage.getItem("jwt")}`, // JWT 토큰 포함
+          Authorization: `${sessionStorage.getItem("jwt")}`,
         },
       });
 
-      if (!res.ok) throw new Error("서버 오류");
+      if (!res.ok) throw new Error("수정 실패");
 
-      const data = await res.json();
-      console.log("서버 응답:", data);
-      alert("게시글이 등록되었습니다.");
-      navigate("/");
+      alert("게시글이 수정되었습니다.");
+      navigate("/"); // 메인 페이지로 이동
     } catch (err) {
-      console.error("에러 발생:", err);
-      alert("등록 중 오류가 발생했습니다.");
+      console.error(err);
+      alert("수정 중 오류가 발생했습니다.");
     }
   };
 
+  // 수정 취소
   const handleCancel = () => {
-    if (window.confirm("작성 중인 내용을 취소하시겠습니까?")) {
-      setTitle("");
-      setHashtags("");
-      setContent("");
-      setFiles([]);
+    if (window.confirm("수정을 취소하시겠습니까?")) {
+      navigate("/");
     }
   };
 
   return (
     <Box>
-      {/* 상단바 */}
-
-
-      {/* 본문 */}
       <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
         <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
           <Grid container spacing={4}>
-            {/* 제목 */}
             <Grid item xs={12}>
               <TextField
                 label="제목"
@@ -103,7 +118,6 @@ export default function PostWrite() {
               />
             </Grid>
 
-            {/* 해시태그 */}
             <Grid item xs={12}>
               <TextField
                 label="해시태그"
@@ -116,7 +130,6 @@ export default function PostWrite() {
               />
             </Grid>
 
-            {/* 본문 */}
             <Grid item xs={12}>
               <TextField
                 label="본문 내용"
@@ -129,14 +142,9 @@ export default function PostWrite() {
               />
             </Grid>
 
-            {/* 첨부파일 */}
             <Grid item xs={12}>
               <Box display="flex" alignItems="center" gap={2}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                // startIcon={<UploadFile />}
-                >
+                <Button variant="outlined" component="label">
                   파일 업로드
                   <input
                     type="file"
@@ -151,15 +159,8 @@ export default function PostWrite() {
                   <ListItem
                     key={idx}
                     secondaryAction={
-                      <IconButton
-                        edge="end"
-                         aria-label="delete"
-                        onClick={() =>
-                          setFiles(files.filter((_, i) => i !== idx))
-                        }
-                      >
+                      <IconButton edge="end" onClick={() => handleFileRemove(idx)}>
                         <CloseIcon />
-                        {/* 삭제 아이콘 */}
                       </IconButton>
                     }
                   >
@@ -169,22 +170,11 @@ export default function PostWrite() {
               </List>
             </Grid>
 
-            {/* 버튼 */}
             <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                sx={{ px: 4 }}
-              >
-                등록
+              <Button variant="contained" color="primary" onClick={handleUpdate}>
+                수정
               </Button>
-              <Button
-                variant="outlined"
-                color="inherit"
-                onClick={handleCancel}
-                sx={{ px: 4 }}
-              >
+              <Button variant="outlined" color="inherit" onClick={handleCancel}>
                 취소
               </Button>
             </Grid>
