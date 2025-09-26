@@ -37,6 +37,7 @@ export type Post = {
 // 댓글
 export type Comment = {
   postId: number;
+  userId: number;
   nickname?: string;
   comment: string;
   createdAt: Date;

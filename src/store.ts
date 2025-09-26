@@ -9,7 +9,7 @@ export type AuthStore = {
     logout: () => void;
 }
 
-//로그인 상태만 확인
+
 export const useAuthStore = create<AuthStore>((set) => ({
     isAuthenticated: !!sessionStorage.getItem("jwt"),
     userInfo: {

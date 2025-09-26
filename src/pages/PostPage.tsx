@@ -5,8 +5,7 @@ import type { Comment, Post } from "../type";
 import { deletePost, getPostId } from "../api/postsApi";
 import { createComment, getComment } from "../api/CommentApi";
 import { useAuthStore } from "../store";
-import type { ViewPost } from "../types";
-import { getPostById } from "../api/TestApi";
+
 
 export default function PostPage() {
     const { id } = useParams();
@@ -71,6 +70,7 @@ export default function PostPage() {
 
         const commentData: Comment = {
             postId: Number(id),
+            userId: userInfo.userId,
             comment: commentText,
             nickname: userInfo.nickname,
             createdAt: new Date()

@@ -15,7 +15,10 @@ export const getComment = async (postId: number): Promise<Comment[]> => {
 
 //댓글 작성
 export const createComment = async (CommentData: Comment): Promise<void> => {
-    return await axios
-        .post(`/app/post/${CommentData.postId}/comment`, CommentData)
+    return await axios.post(`/api/post/${CommentData.postId}/comment`, {
+        comment: CommentData.comment,
+        userId: CommentData.userId, // 세션스토리지에서 꺼낸 값
+    });
+
 }
 
