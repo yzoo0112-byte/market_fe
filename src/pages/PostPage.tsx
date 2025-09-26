@@ -46,15 +46,7 @@ export default function PostPage() {
         }
     }, [])
 
-    const [viewpost, setViewPost] = useState<ViewPost | null>(null);
-
-    //메인페이지 목록 리스트에서 클릭 시 해당 id에 관한 정보 백엔드에서 가져오기 
-    useEffect(() => {
-        if (!id) return;
-        getPostById(Number(id)).then((data) => {
-            setViewPost(data);
-        });
-    }, [id]);
+ 
 
     // 게시글 삭제
     const handleDelete = async () => {

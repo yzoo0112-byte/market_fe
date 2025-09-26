@@ -31,7 +31,7 @@ export default function Login() {
       .then((token) => {
         sessionStorage.setItem("jwt", token);
         login();
-        navigate("/post");
+        navigate("/");
       })
       .catch(() => {
         setUser({ ...user, password: "" });

@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 
-export async function createPost(post: PostForm): Promise<any> {
+export async function createPost(post: PostForm){
     const formData = new FormData();
     formData.append("title", post.title);
     formData.append("hashtag", post.hashtag);
