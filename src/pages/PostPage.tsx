@@ -1,9 +1,9 @@
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { Comment, Post } from "../type";
+import type { Comment, CommentCreateRequest, Post } from "../type";
 import { deletePost, getPostId } from "../api/postsApi";
-import { createComment, getComment } from "../api/CommentApi";
+import { createComment, deleteCommnet, getComment } from "../api/CommentApi";
 import { useAuthStore } from "../store";
 
 
@@ -68,12 +68,11 @@ export default function PostPage() {
     const handleSubmit = async () => {
         if (!commentText || !userInfo) return;
 
-        const commentData: Comment = {
+        const commentData: CommentCreateRequest = {
             postId: Number(id),
             userId: userInfo.userId,
             comment: commentText,
             nickname: userInfo.nickname,
-            createdAt: new Date()
         };
 
         try {
@@ -86,6 +85,29 @@ export default function PostPage() {
             console.error(error);
         }
     };
+
+    //댓글 삭제
+    const handleComDelete = async (commentId: number) => {
+        if (!id) return;
+
+        const confirmDelete = window.confirm("정말로 이 댓글을 삭제하시겠습니까?");
+        if (!confirmDelete) return;
+
+
+        try {
+            await deleteCommnet({
+                postId: Number(id),
+                commentId: commentId
+
+            });
+            alert("댓글이 삭제되었습니다.");
+            fetchPostData();
+        } catch (error) {
+            alert("삭제 실패");
+            console.error(error);
+        }
+
+    }
 
 
     return (
@@ -113,7 +135,7 @@ export default function PostPage() {
                 <Box display="flex" flexDirection="column" gap={2}>
                     <TextField
                         label="댓글"
-                        name="commetn"
+                        name="comment"
                         variant="outlined"
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
@@ -138,6 +160,14 @@ export default function PostPage() {
                                 <Typography variant="body1">
                                     {comment.comment}
                                 </Typography>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleComDelete(comment.commentId)}
+                                >
+                                    삭제
+                                </Button>
                             </Box>
                         ))
                     ) : (

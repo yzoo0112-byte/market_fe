@@ -36,6 +36,7 @@ export type Post = {
 
 // 댓글
 export type Comment = {
+  commentId: number;
   postId: number;
   userId: number;
   nickname?: string;
@@ -50,3 +51,17 @@ export type ComUserInfo = {
   userId: number;
   nickname: string;
 }
+
+// 댓글 삭제용
+export type DComment = {
+  commentId: number;
+  postId: number;
+}
+
+// 댓글 생성용
+export type CommentCreateRequest = {
+  postId: number;
+  userId: number;
+  comment: string;
+  nickname: string;
+};
