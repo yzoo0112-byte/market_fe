@@ -10,6 +10,7 @@ import { useAuthStore } from "../store";
 export default function PostPage() {
     const { id } = useParams();
     const { userInfo, isAuthenticated } = useAuthStore();
+    const [eCommentId, setECommentId] = useState<number | null>(null);
     const [post, setPost] = useState<Post>({
         postId: 0,
         userId: 0,
@@ -109,6 +110,13 @@ export default function PostPage() {
 
     }
 
+    // 댓글 수정
+    const handelComEdit = async (comment: Comment) => {
+        setCommentText(comment.comment);
+        setECommentId
+    };
+
+
 
     return (
         <>
@@ -167,6 +175,13 @@ export default function PostPage() {
                                     onClick={() => handleComDelete(comment.commentId)}
                                 >
                                     삭제
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={handelComEdit}
+                                >
+                                    수정
                                 </Button>
                             </Box>
                         ))
