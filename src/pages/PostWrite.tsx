@@ -85,9 +85,7 @@ export default function PostWrite() {
   };
 
   return (
-    <Box>
-      {/* 상단바 */}
-      {/* 본문 */}
+      <>
       <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
         <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
           <Grid container spacing={4}>
@@ -166,29 +164,19 @@ export default function PostWrite() {
                 ))}
               </List>
             </Grid>
-
-            {/* 버튼 */}
-            <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                sx={{ px: 4 }}
-              >
-                등록
-              </Button>
-              <Button
-                variant="outlined"
-                color="inherit"
-                onClick={handleCancel}
-                sx={{ px: 4 }}
-              >
-                취소
-              </Button>
-            </Grid>
           </Grid>
+
+          {/* 버튼 */}
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <Button variant="contained" color="primary" onClick={handleSave} sx={{ px: 4 }}>
+              등록
+            </Button>
+            <Button variant="outlined" color="inherit" onClick={handleCancel} sx={{ px: 4 }}>
+              취소
+            </Button>
+          </Box>
         </Paper>
       </Container>
-    </Box>
+    </>
   );
 }
