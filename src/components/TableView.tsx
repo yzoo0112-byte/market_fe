@@ -6,6 +6,8 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import MainSearch from "./MainSearch";
 import { useSearch } from "../contexts/useSearch"; 
 import { getPosts } from "../api/posts";  // API import
+import { useNavigate } from "react-router-dom";
+import PostWriteBtn from "./PostWriteBtn";
 
 export default function TableView() {
     const pageSize = 5;
@@ -71,6 +73,8 @@ export default function TableView() {
 
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
+    const navigate = useNavigate(); //상세페이지로 이동할 때 필요
+
     return (
         <Box>
             <MainSearch />
@@ -80,15 +84,20 @@ export default function TableView() {
                     <FilterListIcon />
                 </IconButton>
             </Box>
-
+            
             <DataGrid
                 rows={posts}
                 columns={columns}
                 getRowId={(row) => row.postId}
                 hideFooter
                 loading={loading}
+                onRowClick={(params) => navigate(`/post/${params.id}`)} //상세페이지로 이동할 때 필요
                 autoHeight
             />
+
+            <Box display="flex" justifyContent="flex-end" p={2} >
+                    <PostWriteBtn /> {/* 글 작성 버튼 */}
+                </Box>
 
             <Box display="flex" justifyContent="center" mt={2} gap={1}>
                 <Button
@@ -117,6 +126,7 @@ export default function TableView() {
                 >
                     {">>"}
                 </Button>
+
             </Box>
 
             <Dialog open={openSortModal} onClose={() => setOpenSortModal(false)}>

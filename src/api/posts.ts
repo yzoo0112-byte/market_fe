@@ -1,15 +1,5 @@
 import axios from 'axios';
-
-export interface ViewPost {
-  postId: number;
-  title: string;
-  nickname: string;
-  views: number;
-  create_at: string;
-  update_at: string;
-  contents?: string;
-  hashtag?: string;
-}
+import type { ViewPost } from '../types';
 
 type SortKeyType = 'postId' | 'title' | 'nickname' | 'views' | 'create_at' | 'update_at';
 

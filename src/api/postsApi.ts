@@ -3,51 +3,50 @@ import axios from "axios";
 
 
 
-export async function createPost(post: PostForm): Promise<any> {
-  const formData = new FormData();
-  formData.append("title", post.title);
-  formData.append("hashtags", post.hashtags);
-  formData.append("content", post.content);
-  post.files.forEach((file) => {
-    formData.append("files", file);
-  });
-
-  try {
-    const response = await fetch("http://localhost:8080/api/posts", {
-      method: "POST",
-      body: formData,
+export async function createPost(post: PostForm) {
+    const formData = new FormData();
+    formData.append("title", post.title);
+    formData.append("hashtag", post.hashtag);
+    formData.append("content", post.content);
+    post.files.forEach((file) => {
+        formData.append("files", file);
     });
 
-    if (!response.ok) {
-      throw new Error("서버 응답 실패");
-    }
+    try {
+        const response = await fetch("http://localhost:8080/api/post", {
+            method: "POST",
+            body: formData,
+        });
 
-    return await response.json();
-  } catch (error) {
-    console.error("게시글 등록 오류:", error);
-    throw error;
-  }
+        if (!response.ok) {
+            throw new Error("서버 응답 실패");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("게시글 등록 오류:", error);
+        throw error;
+    }
 
 }
 
 // 게시글 상세 조회
 export const getPostId = async (id: number) => {
-  const token = sessionStorage.getItem("jwt");
-  const res = await axios.get(`/api/posts/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data; // 서버가 { ...post } 형태로 응답한다고 가정
+
+    const response = await axios.get(`/api/post/${id}`
+    );
+    console.log(response.data)
+    return response.data;
+
 };
+
 
 // 게시글 삭제
 export const deletePost = async (id: number) => {
-  const token = sessionStorage.getItem("jwt");
-  await axios.delete(`/api/posts/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+
+    const response = await axios.delete(`/api/post/${id}`
+
+    );
+    return response.data;
 };
 

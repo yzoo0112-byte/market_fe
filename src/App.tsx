@@ -10,12 +10,16 @@ import PostPage from './pages/PostPage'
 import PostWrite from "./pages/PostWrite";
 import TableView from './components/TableView'
 import { SearchProvider } from './contexts/SearchProvider'
+import PostEdit from './pages/PostEdit'
+import AdminUserList from './list/AdminUserList'
+
 
 
 
 export default function App() {
   return (
     <BrowserRouter>
+    {/* <AuthProvider> */}
       <SearchProvider>
         <CssBaseline />
         <AppBar position="fixed" color="transparent" elevation={0}>
@@ -34,11 +38,14 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/post/:id" element={<PostPage />} />
-            <Route path="/posts" element={<PostWrite />} />
+            <Route path="/post/edit/:id" element={<PostEdit />} />
+            <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
+            <Route path="/manage/users" element={<AdminUserList />} />
           </Routes>
         </Container>
       </SearchProvider>
+      {/* </AuthProvider> */}
     </BrowserRouter>
   );
 }

@@ -1,32 +1,54 @@
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
-import { Badge, Box, Button, Container, Typography } from "@mui/material";
+import { useParams } from "react-router-dom";
+import type { Comment, CommentCreateRequest, Post } from "../type";
 import { deletePost, getPostId } from "../api/postsApi";
+import { createComment, deleteCommnet, getComment } from "../api/CommentApi";
+import { useAuthStore } from "../store";
 
-
-type Posts = {
-    id: number;
-    nickName: string;
-    title: string;
-    content: string;
-    createAt: string;
-    updateAt: string;
-    views: number;
-    hashtage: string;
-    images?: string[];
-}
 
 export default function PostPage() {
-    const [post, setPost] = useState<Posts | null>(null);
     const { id } = useParams();
+    const { userInfo, isAuthenticated } = useAuthStore();
+    const [post, setPost] = useState<Post>({
+        postId: 0,
+        userId: 0,
+        title: "",
+        content: "",
+        createAt: new Date(),
+        updateAt: new Date(),
+        views: 0,
+        hashtag: "",
+        fileList: []
+    });
+
+    //댓글 내용
+    const [commentText, setCommentText] = useState("");
+    //댓글 리스트
+    const [comment, setComment] = useState<Comment[]>([]);
+
+    const fetchPostData = async () => {
+        try {
+            const postResponse = await getPostId(Number(id));
+            setPost(postResponse);
+
+            const commentResponse = await getComment(Number(id));
+            setComment(commentResponse);
+        } catch (error) {
+            console.error("데이터 로딩 실패", error);
+        }
+    };
+
     useEffect(() => {
         if (id) {
-            getPostId(Number(id)).then(setPost).catch(console.error);
+            fetchPostData();
         }
-    }, [id]);
+    }, [])
 
+
+    // 게시글 삭제
     const handleDelete = async () => {
-        if (!id) return
+        if (!id) return;
 
         const confirmDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
         if (!confirmDelete) return;
@@ -34,73 +56,129 @@ export default function PostPage() {
         try {
             await deletePost(Number(id));
             alert("게시글이 삭제되었습니다.");
-            window.location.href = "/";
+            window.location.href = "/"; // 홈으로 리디렉션
         } catch (error) {
             alert("삭제 실패");
             console.error(error);
         }
+
+    }
+
+    // 댓글 작성
+    const handleSubmit = async () => {
+        if (!commentText || !userInfo) return;
+
+        const commentData: CommentCreateRequest = {
+            postId: Number(id),
+            userId: userInfo.userId,
+            comment: commentText,
+            nickname: userInfo.nickname,
+        };
+
+        try {
+            await createComment(commentData);
+            setCommentText("");
+            fetchPostData();
+            alert("댓글이 성공적으로 등록되었습니다!");
+        } catch (error) {
+            alert("댓글 등록 실패");
+            console.error(error);
+        }
+    };
+
+    //댓글 삭제
+    const handleComDelete = async (commentId: number) => {
+        if (!id) return;
+
+        const confirmDelete = window.confirm("정말로 이 댓글을 삭제하시겠습니까?");
+        if (!confirmDelete) return;
+
+
+        try {
+            await deleteCommnet({
+                postId: Number(id),
+                commentId: commentId
+
+            });
+            alert("댓글이 삭제되었습니다.");
+            fetchPostData();
+        } catch (error) {
+            alert("삭제 실패");
+            console.error(error);
+        }
+
     }
 
 
     return (
         <>
-            {post ? (
-                <Container maxWidth="md" sx={{ mt: 4 }}>
-
-                    {/* 제목 */}
-                    <Typography variant="h4" gutterBottom>{post.title}</Typography>
-
-
-                    {/* 수정버튼 */}
-                    {/* 삭제버튼 */}
-                    <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                        <Button variant="outlined">수정</Button>
+            <Container maxWidth="sm">
+                {/* 삭제버튼 */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
+                    <Typography variant="h4">{post.title}</Typography>
+                    {/* 유효하지 않은 유저는 삭제버튼 비활성화 */}
+                    {isAuthenticated && (
                         <Button
                             variant="outlined"
                             color="error"
-                            onClick={handleDelete} >삭제</Button>
-                    </Box>
+                            onClick={handleDelete}
+                        >
+                            삭제
+                        </Button>
+                    )}
+                </Box>
+                {/* <img src={`??`} alt="게시글 이미지" style={{ width: "100%" }} /> */}
+                <Typography variant="body1" sx={{ marginY: 2 }}>{post.content}</Typography>
+                <Typography variant="h6" sx={{ mt: 4 }}></Typography>
+                {/* 댓글 입력 폼 */}
 
-                    {/* 글번호 */}
-                    {/* 작성자 */}
-                    {/* 작성일(수정일) */}
-                    {/* 조회수 */}
-                    <Box sx={{ mt: 2, fontSize: 14, color: "gray" }}>
-                        글번호: {post.id} | 작성자 : {post.nickName} | 작성일: {post.createAt} | 수정일: {post.updateAt} | 조회수: {post.views}
-                    </Box>
+                <Box display="flex" flexDirection="column" gap={2}>
+                    <TextField
+                        label="댓글"
+                        name="comment"
+                        variant="outlined"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        multiline
+                        minRows={3}
+                        required
+                    />
+                    <Button variant="contained" color="primary" onClick={handleSubmit}>
+                        등록
+                    </Button>
+                </Box>
 
-                    {/* 해시태그 */}
-                    <Badge color="primary" badgeContent={post.hashtage} />
 
-                    {/* 첨부파일 */}
-                    {/* 본문 이미지 */}
-                    {post.images && post.images.length > 0 && (
-                        <Box sx={{ mt: 3 }}>
-                            {post.images.map((src, idx) => (
-                                <Box key={idx} sx={{ mb: 2 }}>
-                                    <img src={src} alt={`본문 이미지 ${idx + 1}`} style={{ width: "100%", borderRadius: 8 }} />
-                                </Box>
-                            ))}
-                        </Box>
+                {/* 댓글 목록 표시 */}
+                <Box sx={{ mt: 4 }}>
+                    {comment.length > 0 ? (
+                        comment.map((comment, index) => (
+                            <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: '4px' }}>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    {comment.nickname}
+                                </Typography>
+                                <Typography variant="body1">
+                                    {comment.comment}
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleComDelete(comment.commentId)}
+                                >
+                                    삭제
+                                </Button>
+                            </Box>
+                        ))
+                    ) : (
+                        <Typography variant="body2" color="text.secondary">
+                            아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+                        </Typography>
                     )}
 
-                    {/* 본문 */}
-                    <Typography variant="body1" sx={{ mt: 3, whiteSpace: "pre-line" }}>
-                        {post.content}
-                    </Typography>
 
-                    {/* 좋아요 */}
-                    <Box sx={{ mt: 4 }}>
-                        <Button>좋아요</Button>
-                    </Box>
-                </Container>
-            ) : (
-                <Container maxWidth="md" sx={{ mt: 4, textAlign: 'center' }}>
-                    <Typography variant="h6">게시물을 불러오는 중입니다...</Typography>
-                </Container>
-            )}
-
-
+                </Box>
+            </Container>
         </>
-    )
+    );
 }
