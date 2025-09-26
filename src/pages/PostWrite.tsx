@@ -6,14 +6,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   Button,
   TextField,
-  Container,
-  Paper,
+
   Box,
   Grid,
   IconButton,
   List,
   ListItem,
   ListItemText,
+  Container,
+  Paper,
 } from "@mui/material";
 
 export default function PostWrite() {
@@ -86,8 +87,6 @@ export default function PostWrite() {
   return (
     <Box>
       {/* 상단바 */}
-
-
       {/* 본문 */}
       <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
         <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
@@ -102,7 +101,6 @@ export default function PostWrite() {
                 variant="outlined"
               />
             </Grid>
-
             {/* 해시태그 */}
             <Grid item xs={12}>
               <TextField
