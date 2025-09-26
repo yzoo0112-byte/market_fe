@@ -25,8 +25,10 @@ export default function Header() {
 
   return (
     <div className="header">
-      <div className="logo" onClick={() => navigate("/")}>
-        캐럿마켓
+       <div className="logo">
+        <span className="logo-text" onClick={() => navigate("/")}>
+          캐럿마켓
+        </span>
       </div>
       <div className="nav-right">
         {isAuthenticated ? (
