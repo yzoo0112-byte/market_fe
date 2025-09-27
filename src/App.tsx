@@ -12,6 +12,7 @@ import TableView from './components/TableView'
 import { SearchProvider } from './contexts/SearchProvider'
 import PostEdit from './pages/PostEdit'
 import AdminUserList from './list/AdminUserList'
+import ManagePage from './pages/Managepage'
 
 
 
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
             <Route path="/manage/users" element={<AdminUserList />} />
+            <Route path="/manage/visit" element={<ManagePage />} />
           </Routes>
         </Container>
       </SearchProvider>

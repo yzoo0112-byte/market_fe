@@ -65,3 +65,15 @@ export type CommentCreateRequest = {
   comment: string;
   nickname: string;
 };
+
+//방문자수
+export type RawVisit = {
+  visit_date: string;
+  visits: number;
+};
+
+export type VisitData = {
+  daily: { date: string; count: number }[];
+  monthly: { month: string; count: number }[];
+};
+
