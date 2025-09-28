@@ -63,10 +63,82 @@ export default function ManagePage() {
     <>
       <h2>방문자 통계</h2>
       <div style={{ width: "100%", maxWidth: "800px", marginBottom: "40px" }}>
-        <Line data={dailyChart} />
+        <Line 
+        data={dailyChart} 
+        options={{
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "일별 방문자 수",
+            },
+            legend: {
+              display: true,
+              position: "top",
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "날짜",
+              },
+            },
+            y: {
+              ticks: {
+                stepSize: 1, // 소수점 없이 1 단위로 표시
+                precision: 0, // 소수점 자릿수 제거
+              },
+
+
+              title: {
+                display: true,
+                text: "방문자 수",
+              },
+              beginAtZero: true,
+            },
+          },
+
+        }}/>
       </div>
       <div style={{ width: "100%", maxWidth: "800px" }}>
-        <Bar data={monthlyChart} />
+        <Bar 
+        data={monthlyChart} 
+        options={{
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "월별 방문자 수",
+            },
+            legend: {
+              display: true,
+              position: "top",
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "날짜",
+              },
+            },
+            y: {
+              ticks: {
+                stepSize: 1, // 소수점 없이 1 단위로 표시
+                precision: 0, // 소수점 자릿수 제거
+              },
+
+
+              title: {
+                display: true,
+                text: "방문자 수",
+              },
+              beginAtZero: true,
+            },
+          },
+
+        }}/>
       </div>
     </>
   );

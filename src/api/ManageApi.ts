@@ -1,4 +1,4 @@
-// ManageApi.ts
+
 import axios from "axios";
 import dayjs from "dayjs";
 import { BASE_URL } from "./LoginApi";
