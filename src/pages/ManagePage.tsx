@@ -62,11 +62,15 @@ export default function ManagePage() {
   return (
     <>
       <h2>방문자 통계</h2>
-      <div style={{ width: "100%", maxWidth: "800px", marginBottom: "40px" }}>
+      <div style={{ width: "100%",marginBottom: "40px" }}>
         <Line 
         data={dailyChart} 
         options={{
           responsive: true,
+          animation: {
+            duration: 0, // 애니메이션 지속 시간 0으로 설정
+          },
+
           plugins: {
             title: {
               display: true,
@@ -101,11 +105,15 @@ export default function ManagePage() {
 
         }}/>
       </div>
-      <div style={{ width: "100%", maxWidth: "800px" }}>
+      <div style={{ width: "100%" }}>
         <Bar 
         data={monthlyChart} 
         options={{
           responsive: true,
+          animation: {
+            duration: 0, // 애니메이션 지속 시간 0으로 설정
+          },
+
           plugins: {
             title: {
               display: true,
