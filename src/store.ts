@@ -15,6 +15,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
     userInfo: {
         userId: Number(sessionStorage.getItem("userId")),
         nickname: sessionStorage.getItem("nickname") ?? "",
+        loginId: sessionStorage.getItem("loginId") ?? "",
+        role: sessionStorage.getItem("role") ?? "",
     },
     login: (user: ComUserInfo) => {
         set({ isAuthenticated: true, userInfo: user })
@@ -25,7 +27,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
         set({
             isAuthenticated: false, userInfo: {
                 userId: 0,
-                nickname: ""
+                nickname: "",
+                loginId: "",
+                role: ""
             }
         });
     }

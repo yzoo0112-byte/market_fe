@@ -1,9 +1,14 @@
 import axios from "axios";
-import type { Comment, CommentCreateRequest, DComment } from "../type";
+import type { Comment, CommentCreateRequest, DComment, UpdateCommentLoad } from "../type";
 
 //댓글 수정
-export const updateComment = async (CommentData: Comment): Promise<Comment> => {
-    return axios.patch(`/api/post/${CommentData.postId}comment/${CommentData.commentId}`, CommentData);
+export const updateComment = async (CommentData: UpdateCommentLoad): Promise<Comment> => {
+    const token = sessionStorage.getItem("jwt")
+    return axios.put(`/api/post/${CommentData.postId}/comment/${CommentData.commentId}`, CommentData,
+        {
+            headers: { Authorization: `Bearer ${token}` }
+        }
+    );
 };
 
 //댓글 조회

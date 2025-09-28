@@ -4,7 +4,7 @@ import type { ViewPost } from "../types";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, MenuItem, Radio, RadioGroup, Select } from "@mui/material";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MainSearch from "./MainSearch";
-import { useSearch } from "../contexts/useSearch"; 
+import { useSearch } from "../contexts/useSearch";
 import { getPosts } from "../api/posts";  // API import
 import { useNavigate } from "react-router-dom";
 import PostWriteBtn from "./PostWriteBtn";
@@ -51,15 +51,16 @@ export default function TableView() {
             sortOrder,
             keyword: keyword || undefined,
         })
-        .then(({ data, total }) => {
-            setPosts(data);
-            setTotal(total);
-            setLoading(false);
-        })
-        .catch((error) => {
-            console.error("Failed to fetch posts", error);
-            setLoading(false);
-        });
+            .then(({ data }) => {
+                const filtered = data.filter((post) => !post.deleted);
+                setPosts(filtered);
+                setTotal(filtered.length);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Failed to fetch posts", error);
+                setLoading(false);
+            });
     }, [page, pageSize, sortKey, sortOrder, keyword]);
 
     const columns: GridColDef[] = [
@@ -84,7 +85,7 @@ export default function TableView() {
                     <FilterListIcon />
                 </IconButton>
             </Box>
-            
+
             <DataGrid
                 rows={posts}
                 columns={columns}
@@ -96,8 +97,8 @@ export default function TableView() {
             />
 
             <Box display="flex" justifyContent="flex-end" p={2} >
-                    <PostWriteBtn /> {/* 글 작성 버튼 */}
-                </Box>
+                <PostWriteBtn /> {/* 글 작성 버튼 */}
+            </Box>
 
             <Box display="flex" justifyContent="center" mt={2} gap={1}>
                 <Button
