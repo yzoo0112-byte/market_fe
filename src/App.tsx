@@ -13,6 +13,8 @@ import { SearchProvider } from './contexts/SearchProvider'
 import PostEdit from './pages/PostEdit'
 import AdminUserList from './list/AdminUserList'
 import ManageFileSetting from './components/ManageFileSetting'
+import AdminRoute from './components/AdminRoute'
+import { AuthProvider } from './contexts/AuthProvider'
 
 
 
@@ -20,7 +22,7 @@ import ManageFileSetting from './components/ManageFileSetting'
 export default function App() {
   return (
     <BrowserRouter>
-    {/* <AuthProvider> */}
+    <AuthProvider>
       <SearchProvider>
         <CssBaseline />
         <AppBar position="fixed" color="transparent" elevation={0}>
@@ -42,12 +44,36 @@ export default function App() {
             <Route path="/post/edit/:id" element={<PostEdit />} />
             <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
-            <Route path="/manage/users" element={<AdminUserList />} />
-            <Route path="/manage/fileSetting" element={<ManageFileSetting/>} />
+            {/* <Route path="/manage/users" element={<AdminUserList />} /> */}
+
+
+
+          {/* ADMIN에서만 쓸수 있는 페이지: path랑 컴포넌트만 바꿔서 쓰면 됨 */}
+          <Route
+              path="/manage/fileSetting"
+              element={
+                <AdminRoute>  
+                  <ManageFileSetting /> {/* <- 여기만 수정 */}
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/manage/users"
+              element={
+                <AdminRoute>  
+                  <AdminUserList />  {/* <- 여기만 수정 */}
+                </AdminRoute>
+              }
+            />
+
+
+
+
+
           </Routes>
         </Container>
       </SearchProvider>
-      {/* </AuthProvider> */}
+      </AuthProvider>
     </BrowserRouter>
   );
 }

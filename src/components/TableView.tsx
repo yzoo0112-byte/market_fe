@@ -77,7 +77,7 @@ export default function TableView() {
 
     return (
         <Box>
-            <MainSearch />
+            {/* <MainSearch /> */}
 
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.1}>
                 <IconButton onClick={openSortDialog}>
