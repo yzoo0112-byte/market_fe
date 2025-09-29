@@ -7,5 +7,6 @@ export type ViewPost = {
     create_at: string
     update_at: string
     hashtag?: string[]
+    deleted: boolean
 }
 

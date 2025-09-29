@@ -12,6 +12,7 @@ import TableView from './components/TableView'
 import { SearchProvider } from './contexts/SearchProvider'
 import PostEdit from './pages/PostEdit'
 import AdminUserList from './list/AdminUserList'
+import TrashPage from './pages/TrashPage'
 
 
 
@@ -19,7 +20,7 @@ import AdminUserList from './list/AdminUserList'
 export default function App() {
   return (
     <BrowserRouter>
-    {/* <AuthProvider> */}
+      {/* <AuthProvider> */}
       <SearchProvider>
         <CssBaseline />
         <AppBar position="fixed" color="transparent" elevation={0}>
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
             <Route path="/manage/users" element={<AdminUserList />} />
+            <Route path="/post/d/trash" element={<TrashPage />} />
           </Routes>
         </Container>
       </SearchProvider>
