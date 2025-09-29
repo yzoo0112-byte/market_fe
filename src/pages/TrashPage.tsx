@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button, Table, TableBody, TableCell, TableHead, TableRow, Typography, Box } from "@mui/material";
+import { Button, Table, TableBody, TableCell, TableHead, TableRow, Typography, Box, Stack } from "@mui/material";
+import axios from "axios";
+import { saveAs } from "file-saver";
 
 import type { TrashPost } from "../type";
 import { getDeletedPosts, permanentlyDeletePost, restorePost } from "../api/TrashApi";
-
-
 
 export default function TrashPage() {
     const [posts, setPosts] = useState<TrashPost[]>([]);
@@ -20,7 +20,6 @@ export default function TrashPage() {
         } finally {
             setLoading(false);
         }
-
     };
 
     const handleRestore = async (postId: number) => {
@@ -33,7 +32,6 @@ export default function TrashPage() {
         }
     };
 
-
     const handlePermanentDelete = async (postId: number) => {
         if (!window.confirm("정말로 영구 삭제하시겠습니까?")) return;
         try {
@@ -45,14 +43,50 @@ export default function TrashPage() {
         }
     };
 
+ // 🔽 엑셀 다운로드
+const handleDownloadExcel = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8080/post/manage/trash/excel", // 백엔드와 통일
+      {
+        responseType: "blob",
+        headers: {
+          Authorization: sessionStorage.getItem("jwt") || "",
+        },
+      }
+    );
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, "deleted_posts.xlsx");
+  } catch (error) {
+    console.error("엑셀 다운로드 실패:", error);
+    alert("엑셀 다운로드에 실패했습니다.");
+  }
+};
+
+
     useEffect(() => {
         fetchTrash();
     }, []);
 
     return (
         <Box p={4}>
-            <Typography variant="h5" gutterBottom>휴지통</Typography>
-            <Typography variant="subtitle1" gutterBottom>삭제내역</Typography>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                <Box>
+                    <Typography variant="h5" gutterBottom>휴지통</Typography>
+                    <Typography variant="subtitle1" gutterBottom>삭제내역</Typography>
+                </Box>
+                {/* 🔽 엑셀 다운로드 버튼 */}
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleDownloadExcel}
+                >
+                    엑셀 다운로드
+                </Button>
+            </Stack>
 
             <Table>
                 <TableHead>
@@ -73,12 +107,20 @@ export default function TrashPage() {
                             <TableCell>{post.nickname}</TableCell>
                             <TableCell>{new Date(post.createAt).toLocaleDateString()}</TableCell>
                             <TableCell>
-                                <Button variant="outlined" color="primary" onClick={() => handleRestore(post.postId)}>
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={() => handleRestore(post.postId)}
+                                >
                                     복원
                                 </Button>
                             </TableCell>
                             <TableCell>
-                                <Button variant="outlined" color="error" onClick={() => handlePermanentDelete(post.postId)}>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={() => handlePermanentDelete(post.postId)}
+                                >
                                     영구 삭제
                                 </Button>
                             </TableCell>
