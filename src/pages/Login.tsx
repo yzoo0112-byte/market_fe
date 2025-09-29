@@ -39,19 +39,6 @@ export default function Login() {
         setUser({ ...user, password: "" });
         setToastOpen(true);
       });
-
-      // //백엔드 예외 처리 알림창
-      // fetch('/users', {
-      //   method: 'POST',
-      //   body: JSON.stringify(data),
-      //   headers: { 'Content-Type': 'application/json' }
-      // })
-      // .then(res => res.json())
-      // .then(result => {
-      //   if (result.error) {
-      //     alert(result.error); // 또는 toast(result.error)
-      //   }
-      // });
   };
 
   return (

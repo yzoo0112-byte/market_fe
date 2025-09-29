@@ -8,7 +8,7 @@ import { getDeletedPosts, permanentlyDeletePost, restorePost } from "../api/Tras
 
 export default function TrashPage() {
     const [posts, setPosts] = useState<TrashPost[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [setLoading] = useState(false);
 
     const fetchTrash = async () => {
         setLoading(true);
@@ -43,28 +43,28 @@ export default function TrashPage() {
         }
     };
 
- // 🔽 엑셀 다운로드
-const handleDownloadExcel = async () => {
-  try {
-    const response = await axios.get(
-      "http://localhost:8080/post/manage/trash/excel", // 백엔드와 통일
-      {
-        responseType: "blob",
-        headers: {
-          Authorization: sessionStorage.getItem("jwt") || "",
-        },
-      }
-    );
+    // 🔽 엑셀 다운로드
+    const handleDownloadExcel = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:8080/post/manage/trash/excel", // 백엔드와 통일
+                {
+                    responseType: "blob",
+                    headers: {
+                        Authorization: sessionStorage.getItem("jwt") || "",
+                    },
+                }
+            );
 
-    const blob = new Blob([response.data], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    saveAs(blob, "deleted_posts.xlsx");
-  } catch (error) {
-    console.error("엑셀 다운로드 실패:", error);
-    alert("엑셀 다운로드에 실패했습니다.");
-  }
-};
+            const blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+            saveAs(blob, "deleted_posts.xlsx");
+        } catch (error) {
+            console.error("엑셀 다운로드 실패:", error);
+            alert("엑셀 다운로드에 실패했습니다.");
+        }
+    };
 
 
     useEffect(() => {

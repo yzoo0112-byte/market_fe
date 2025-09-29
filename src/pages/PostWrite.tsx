@@ -13,6 +13,7 @@ import {
   Grid
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { getManageSettings, type ManageSettings } from "../api/ManageFileApi";
 
 
 export default function PostWrite() {
@@ -23,50 +24,98 @@ export default function PostWrite() {
 
   const navigate = useNavigate();
 
+  const convertBytesToReadableSize = (bytes: number): string => {
+    if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 ** 3)).toFixed(1)}GB`;
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 ** 2)).toFixed(1)}MB`;
+    if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+    return `${bytes}B`;
+  };
+
+
+  const [managePolicy, setManagePolicy] = useState<ManageSettings>({
+    fileExtension: '',
+    fileMaxSize: 0,
+    fileCount: 0,
+  });
+
+
   useEffect(() => {
     const token = sessionStorage.getItem("jwt");
     if (!token) {
       alert("로그인이 필요합니다.");
       navigate("/login");
     }
+
+
+
+    // 정책 불러오기
+    const fetchPolicy = async () => {
+      try {
+        const settings = await getManageSettings();
+        setManagePolicy(settings);
+      } catch (err) {
+        console.error("파일 정책 불러오기 실패", err);
+      }
+    };
+
+    fetchPolicy();
   }, [navigate]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setFiles((prev) => [...prev, ...newFiles]);
+    if (!e.target.files) return;
 
-      for (const file of newFiles) {
-        if (file.type.startsWith("image")) {
-          const formData = new FormData();
-          formData.append("files", file);
+    const newFiles = Array.from(e.target.files);
+    const allowedExtensions = managePolicy.fileExtension
+      .split(',')
+      .map(ext => ext.trim().toLowerCase());
 
-          try {
-            const res = await fetch("http://localhost:8080/post/image", {
-              method: "POST",
-              body: formData,
-              headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("jwt")}`,
-              },
-            });
+    const totalFiles = files.length + newFiles.length;
 
-            // if (!res.ok) throw new Error("이미지 업로드 실패");
+    // ✅ 파일 개수 제한
+    if (totalFiles > managePolicy.fileCount) {
+      alert(`최대 ${managePolicy.fileCount}개 파일만 업로드할 수 있습니다.`);
+      return;
+    }
 
-            // const result = await res.json();
-            // const imageUrl = `http://localhost:8080/uploads/${result.savedFileName}`;
+    for (const file of newFiles) {
+      const ext = file.name.split('.').pop()?.toLowerCase() || '';
 
-            // setContent((prev) =>
-            //   prev +
-            //   `\n<img src="${imageUrl}" alt="${file.name}" style="max-width:100%; height:auto;" />\n`
-            // );
-          } catch (error) {
-            console.error("이미지 업로드 중 오류 발생:", error);
-            alert("이미지 업로드 실패: 콘솔을 확인하세요.");
-          }
+      // ✅ 확장자 제한
+      if (!allowedExtensions.includes(ext)) {
+        alert(`허용되지 않은 확장자입니다: ${ext}`);
+        continue;
+      }
+
+      // ✅ 용량 제한
+      if (file.size > managePolicy.fileMaxSize) {
+        alert(`파일 용량 초과: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
+        continue;
+      }
+
+      // ✅ 업로드 & 이미지 렌더링
+      setFiles(prev => [...prev, file]);
+
+      if (file.type.startsWith("image")) {
+        const formData = new FormData();
+        formData.append("files", file);
+
+        try {
+          const res = await fetch("http://localhost:8080/post/image", {
+            method: "POST",
+            body: formData,
+            headers: {
+              Authorization: `${sessionStorage.getItem("jwt")}`,
+            },
+          });
+
+        } catch (error) {
+          console.error("이미지 업로드 중 오류 발생:", error);
+          alert("이미지 업로드 실패: 콘솔을 확인하세요.");
         }
       }
     }
   };
+
 
   const handleFileRemove = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -145,6 +194,14 @@ export default function PostWrite() {
 
 
           <Grid size={{ xs: 12 }}>
+            <Box mb={1}>
+              <strong>업로드 제한</strong>
+              <Box fontSize="0.9rem" color="text.secondary">
+                - 허용 확장자: {managePolicy.fileExtension || '-'}<br />
+                - 최대 개수: {managePolicy.fileCount}개<br />
+                - 최대 크기: {convertBytesToReadableSize(managePolicy.fileMaxSize)} / 파일당
+              </Box>
+            </Box>
             <Box display="flex" alignItems="center" gap={2}>
               <Button variant="outlined" component="label">
                 파일 업로드
