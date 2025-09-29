@@ -12,7 +12,11 @@ import TableView from './components/TableView'
 import { SearchProvider } from './contexts/SearchProvider'
 import PostEdit from './pages/PostEdit'
 import AdminUserList from './list/AdminUserList'
-import ManagePage from './pages/Managepage'
+import TrashPage from './pages/TrashPage'
+import ManagePage from './pages/ManagePage'
+import ManageFileSetting from './components/ManageFileSetting'
+import AdminRoute from './components/AdminRoute'
+import { AuthProvider } from './contexts/AuthProvider'
 
 
 
@@ -20,34 +24,72 @@ import ManagePage from './pages/Managepage'
 export default function App() {
   return (
     <BrowserRouter>
-    {/* <AuthProvider> */}
-      <SearchProvider>
-        <CssBaseline />
-        <AppBar position="fixed" color="transparent" elevation={0}>
-          <Toolbar>
-            <Typography variant="h6">
-              <Header />
-            </Typography>
-          </Toolbar>
-        </AppBar>
+      <AuthProvider>
+        <SearchProvider>
+          <CssBaseline />
+          <AppBar position="fixed" color="transparent" elevation={0}>
+            <Toolbar>
+              <Typography variant="h6">
+                <Header />
+              </Typography>
+            </Toolbar>
+          </AppBar>
 
-        {/* ✅ AppBar 높이만큼 여백 확보 */}
-        <Toolbar />
-        <Container maxWidth="xl">
-          <Routes>
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/mypage" element={<MyPage />} />
-            <Route path="/post/:id" element={<PostPage />} />
-            <Route path="/post/edit/:id" element={<PostEdit />} />
-            <Route path="/post" element={<PostWrite />} />
-            <Route path="/" element={<TableView />} />
-            <Route path="/manage/users" element={<AdminUserList />} />
-            <Route path="/manage/visit" element={<ManagePage />} />
-          </Routes>
-        </Container>
-      </SearchProvider>
-      {/* </AuthProvider> */}
+          {/* ✅ AppBar 높이만큼 여백 확보 */}
+          <Toolbar />
+          <Container maxWidth="xl">
+            <Routes>
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/mypage" element={<MyPage />} />
+              <Route path="/post/:id" element={<PostPage />} />
+              <Route path="/post/edit/:id" element={<PostEdit />} />
+              <Route path="/post" element={<PostWrite />} />
+              <Route path="/" element={<TableView />} />
+
+
+              {/* ADMIN에서만 쓸수 있는 페이지: path랑 컴포넌트만 바꿔서 쓰면 됨 */}
+              <Route
+                path="/manage/fileSetting"
+                element={
+                  <AdminRoute>
+                    <ManageFileSetting /> {/* <- 여기만 수정 */}
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/manage/users"
+                element={
+                  <AdminRoute>
+                    <AdminUserList />  {/* <- 여기만 수정 */}
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/manage/trash"
+                element={
+                  <AdminRoute>
+                    <TrashPage />  {/* <- 여기만 수정 */}
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/manage/visit"
+                element={
+                  <AdminRoute>
+                    <ManagePage />  {/* <- 여기만 수정 */}
+                  </AdminRoute>
+                }
+              />
+
+
+
+
+
+            </Routes>
+          </Container>
+        </SearchProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

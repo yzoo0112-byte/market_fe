@@ -31,8 +31,23 @@ export type Post = {
   updateAt?: Date;
   views: number;
   hashtag: string;
-  fileList: File[];
+  fileList: PostFile[];
+  likeCount: number;
+  nickname: string;
+  deleted: boolean
 }
+
+// 첨부파일
+export type PostFile = {
+  fileId: number;
+  post: number;
+  fileName: string;
+  fileUrl: string;
+  fileOrgname: string;
+  imageYn: string;
+  fileSize: number;
+};
+
 
 // 댓글
 export type Comment = {
@@ -50,6 +65,8 @@ export type ComUserInfo = {
   //유저 생성번호
   userId: number;
   nickname: string;
+  loginId: string;
+  role: string;
 }
 
 // 댓글 삭제용
@@ -66,6 +83,22 @@ export type CommentCreateRequest = {
   nickname: string;
 };
 
+//댓글 수정용
+export type UpdateCommentLoad = {
+  commentId: number;
+  postId: number;
+  comment: string;
+  loginId?: string;
+}
+
+//휴지통
+export type TrashPost = {
+  postId: number;
+  title: string;
+  nickname: string;
+  createAt: string;
+  deleted: boolean;
+};
 //방문자수
 export type RawVisit = {
   visit_date: string;

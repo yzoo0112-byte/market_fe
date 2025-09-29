@@ -1,8 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState, } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-
 import {
   Button,
   TextField,
@@ -16,17 +13,14 @@ import {
   Container,
   Paper,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function PostWrite() {
-
-
   const [title, setTitle] = useState("");
   const [hashtag, setHashtags] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
-
-
 
   useEffect(() => {
     const token = sessionStorage.getItem("jwt");
@@ -34,8 +28,7 @@ export default function PostWrite() {
       alert("로그인이 필요합니다.");
       navigate("/login");
     }
-  }, []);
-
+  }, [navigate]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -43,34 +36,33 @@ export default function PostWrite() {
     }
   };
 
+  const handleFileRemove = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+  };
+
   const handleSave = async () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("hashtag", hashtag);
     formData.append("content", content);
-    files.forEach((file) => {
-      formData.append("files", file);
-      formData.append("userId", sessionStorage.getItem("userId")!);
-
-    });
+    files.forEach((file) => formData.append("files", file));
+    formData.append("userId", sessionStorage.getItem("userId")!);
 
     try {
       const res = await fetch("http://localhost:8080/post", {
         method: "POST",
         body: formData,
         headers: {
-          Authorization: `${sessionStorage.getItem("jwt")}`, // JWT 토큰 포함
+          Authorization: `${sessionStorage.getItem("jwt")}`,
         },
       });
 
-      if (!res.ok) throw new Error("서버 오류");
+      if (!res.ok) throw new Error("등록 실패");
 
-      const data = await res.json();
-      console.log("서버 응답:", data);
       alert("게시글이 등록되었습니다.");
       navigate("/");
     } catch (err) {
-      console.error("에러 발생:", err);
+      console.error(err);
       alert("등록 중 오류가 발생했습니다.");
     }
   };
@@ -85,98 +77,73 @@ export default function PostWrite() {
   };
 
   return (
-      <>
-      <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
-        <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
-          <Grid container spacing={4}>
-            {/* 제목 */}
-            <Grid item xs={12}>
-              <TextField
-                label="제목"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
-            {/* 해시태그 */}
-            <Grid item xs={12}>
-              <TextField
-                label="해시태그"
-                value={hashtag}
-                onChange={(e) => setHashtags(e.target.value)}
-                placeholder="예: #프로젝트, #공지, #노션"
-                fullWidth
-                variant="outlined"
-                helperText="쉼표(,)로 구분하여 입력"
-              />
-            </Grid>
-
-            {/* 본문 */}
-            <Grid item xs={12}>
-              <TextField
-                label="본문 내용"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                multiline
-                rows={8}
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
-
-            {/* 첨부파일 */}
-            <Grid item xs={12}>
-              <Box display="flex" alignItems="center" gap={2}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                // startIcon={<UploadFile />}
-                >
-                  파일 업로드
-                  <input
-                    type="file"
-                    multiple
-                    hidden
-                    onChange={handleFileChange}
-                  />
-                </Button>
-              </Box>
-              <List dense>
-                {files.map((file, idx) => (
-                  <ListItem
-                    key={idx}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() =>
-                          setFiles(files.filter((_, i) => i !== idx))
-                        }
-                      >
-                        <CloseIcon />
-                        {/* 삭제 아이콘 */}
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText primary={file.name} />
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
+    <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
+      <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <TextField
+              label="제목"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              fullWidth
+            />
           </Grid>
 
-          {/* 버튼 */}
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="contained" color="primary" onClick={handleSave} sx={{ px: 4 }}>
+          <Grid item xs={12}>
+            <TextField
+              label="해시태그"
+              value={hashtag}
+              onChange={(e) => setHashtags(e.target.value)}
+              placeholder="예: #프로젝트, #공지, #노션"
+              fullWidth
+              helperText="쉼표(,)로 구분하여 입력"
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="본문 내용"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              multiline
+              rows={8}
+              fullWidth
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Button variant="outlined" component="label">
+                파일 업로드
+                <input type="file" multiple hidden onChange={handleFileChange} />
+              </Button>
+            </Box>
+            <List dense>
+              {files.map((file, idx) => (
+                <ListItem
+                  key={idx}
+                  secondaryAction={
+                    <IconButton edge="end" onClick={() => handleFileRemove(idx)}>
+                      <CloseIcon />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText primary={file.name} />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+
+          <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
+            <Button variant="contained" color="primary" onClick={handleSave}>
               등록
             </Button>
-            <Button variant="outlined" color="inherit" onClick={handleCancel} sx={{ px: 4 }}>
+            <Button variant="outlined" onClick={handleCancel}>
               취소
             </Button>
-          </Box>
-        </Paper>
-      </Container>
-    </>
+          </Grid>
+        </Grid>
+      </Paper>
+    </Container>
   );
 }
