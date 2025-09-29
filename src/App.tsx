@@ -17,6 +17,7 @@ import ManagePage from './pages/ManagePage'
 import ManageFileSetting from './components/ManageFileSetting'
 import AdminRoute from './components/AdminRoute'
 import { AuthProvider } from './contexts/AuthProvider'
+import AdminPostList from './list/AdminPostList'
 
 
 
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="/post/edit/:id" element={<PostEdit />} />
               <Route path="/post" element={<PostWrite />} />
               <Route path="/" element={<TableView />} />
+
 
 
               {/* ADMIN에서만 쓸수 있는 페이지: path랑 컴포넌트만 바꿔서 쓰면 됨 */}
@@ -78,6 +80,14 @@ export default function App() {
                 element={
                   <AdminRoute>
                     <ManagePage />  {/* <- 여기만 수정 */}
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/manage/posts"
+                element={
+                  <AdminRoute>
+                    <AdminPostList />  {/* <- 여기만 수정 */}
                   </AdminRoute>
                 }
               />

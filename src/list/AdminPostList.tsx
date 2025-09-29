@@ -6,10 +6,9 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { useSearch } from "../contexts/useSearch";
 import { getPosts } from "../api/posts";  // API import
 import { useNavigate } from "react-router-dom";
-import PostWriteBtn from "./PostWriteBtn";
 
-export default function TableView() {
-    const pageSize = 5;
+export default function AdminPostList() {
+    const pageSize = 10;
 
     const [sortKey, setSortKey] = useState<'postId' | 'title' | 'nickname' | 'views' | 'create_at' | 'update_at'>('postId');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -94,10 +93,6 @@ export default function TableView() {
                 onRowClick={(params) => navigate(`/post/${params.id}`)} //상세페이지로 이동할 때 필요
                 autoHeight
             />
-
-            <Box display="flex" justifyContent="flex-end" p={2} >
-                <PostWriteBtn /> {/* 글 작성 버튼 */}
-            </Box>
 
             <Box display="flex" justifyContent="center" mt={2} gap={1}>
                 <Button
