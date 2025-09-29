@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; 
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -14,6 +14,13 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
+interface FileType {
+  name: string;
+  url?: string;  // 기존 파일이면 url 존재
+  file?: File;   // 새로 업로드된 파일
+  id?: number;   // 기존 파일 ID
+}
+
 export default function PostEdit() {
   const { id } = useParams(); // 게시글 ID
   const navigate = useNavigate();
@@ -21,7 +28,8 @@ export default function PostEdit() {
   const [title, setTitle] = useState("");
   const [hashtag, setHashtags] = useState("");
   const [content, setContent] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<FileType[]>([]);
+  const [removedFiles, setRemovedFiles] = useState<number[]>([]);
 
   // 로그인 확인 및 기존 게시글 불러오기
   useEffect(() => {
@@ -32,37 +40,47 @@ export default function PostEdit() {
       return;
     }
 
-    // 게시글 데이터 불러오기
     fetch(`http://localhost:8080/post/${id}`, {
-      headers: {
-        Authorization: token,
-      },
+      headers: { Authorization: token },
     })
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error("게시글을 불러오지 못했습니다.");
         return res.json();
       })
-      .then((data) => {
+      .then(data => {
         setTitle(data.title);
         setHashtags(data.hashtag);
         setContent(data.content);
-        // 기존 파일은 서버 URL로 관리되므로 별도 처리 필요 (예: 미리보기)
+
+        // 기존 파일 세팅
+        const existingFiles = data.fileList.map((f: any) => ({
+          name: f.fileOrgname,
+          url: f.fileUrl,
+          id: f.fileId
+        }));
+        setFiles(existingFiles);
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
         alert("게시글 정보를 불러오는 중 오류가 발생했습니다.");
       });
   }, [id, navigate]);
 
-  // 파일 추가
+  // 새 파일 추가
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFiles([...files, ...Array.from(e.target.files)]);
+      const newFiles: FileType[] = Array.from(e.target.files).map(file => ({
+        name: file.name,
+        file: file,
+      }));
+      setFiles([...files, ...newFiles]);
     }
   };
 
   // 파일 삭제
   const handleFileRemove = (index: number) => {
+    const removed = files[index];
+    if (removed.id) setRemovedFiles([...removedFiles, removed.id]);
     setFiles(files.filter((_, i) => i !== index));
   };
 
@@ -72,18 +90,20 @@ export default function PostEdit() {
     formData.append("title", title);
     formData.append("hashtag", hashtag);
     formData.append("content", content);
-    files.forEach((file) => {
-      formData.append("files", file);
+
+    // 새로 추가된 파일만 formData에 포함
+    files.forEach(file => {
+      if (!file.url && file.file) formData.append("files", file.file);
     });
-    formData.append("userId", sessionStorage.getItem("userId")!);
+
+    // 삭제할 기존 파일 ID 전달
+    removedFiles.forEach(id => formData.append("removedFiles", id.toString()));
 
     try {
       const res = await fetch(`http://localhost:8080/post/${id}`, {
         method: "PUT",
         body: formData,
-        headers: {
-          Authorization: `${sessionStorage.getItem("jwt")}`,
-        },
+        headers: { Authorization: sessionStorage.getItem("jwt")! },
       });
 
       if (!res.ok) throw new Error("수정 실패");
@@ -96,7 +116,6 @@ export default function PostEdit() {
     }
   };
 
-  // 수정 취소
   const handleCancel = () => {
     if (window.confirm("수정을 취소하시겠습니까?")) {
       navigate("/");
@@ -108,6 +127,7 @@ export default function PostEdit() {
       <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
         <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
           <Grid container spacing={4}>
+            {/* 제목 */}
             <Grid item xs={12}>
               <TextField
                 label="제목"
@@ -118,6 +138,7 @@ export default function PostEdit() {
               />
             </Grid>
 
+            {/* 해시태그 */}
             <Grid item xs={12}>
               <TextField
                 label="해시태그"
@@ -130,6 +151,7 @@ export default function PostEdit() {
               />
             </Grid>
 
+            {/* 본문 */}
             <Grid item xs={12}>
               <TextField
                 label="본문 내용"
@@ -142,6 +164,7 @@ export default function PostEdit() {
               />
             </Grid>
 
+            {/* 첨부파일 */}
             <Grid item xs={12}>
               <Box display="flex" alignItems="center" gap={2}>
                 <Button variant="outlined" component="label">
@@ -164,12 +187,16 @@ export default function PostEdit() {
                       </IconButton>
                     }
                   >
-                    <ListItemText primary={file.name} />
+                    <ListItemText
+                      primary={file.name}
+                      secondary={file.url ? <a href={file.url} target="_blank" rel="noreferrer">보기</a> : null}
+                    />
                   </ListItem>
                 ))}
               </List>
             </Grid>
 
+            {/* 버튼 */}
             <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
               <Button variant="contained" color="primary" onClick={handleUpdate}>
                 수정
