@@ -43,7 +43,7 @@ export default function App() {
             <Route path="/post" element={<PostWrite />} />
             <Route path="/" element={<TableView />} />
             <Route path="/manage/users" element={<AdminUserList />} />
-            <Route path="/trash" element={<TrashPage />} />
+            <Route path="/post/d/trash" element={<TrashPage />} />
           </Routes>
         </Container>
       </SearchProvider>

@@ -2,7 +2,7 @@ import axios from "axios";
 
 //휴wl통 호출
 export const getDeletedPosts = () => {
-    return axios.get("/api/post/trash", {
+    return axios.get("/api/post/d/trash", {
         headers: {
             Authorization: `Bearer ${sessionStorage.getItem("jwt")}`,
         },
