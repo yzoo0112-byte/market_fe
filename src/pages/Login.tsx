@@ -31,6 +31,7 @@ export default function Login() {
       .then((res) => {
         sessionStorage.setItem("userId", res.userId);
         sessionStorage.setItem("nickname", res.nickname);
+        sessionStorage.setItem("role", res.role);
         login(res);
         navigate("/");
       })

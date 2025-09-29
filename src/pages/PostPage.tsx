@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Comment, CommentCreateRequest, Post } from "../type";
 import { getPostId, softDeletePost } from "../api/postsApi";
-// import { deletePost } from "../api/postsApi";
 import { createComment, deleteCommnet, getComment, updateComment } from "../api/CommentApi";
 import { useAuthStore } from "../store";
 import { getLikeSummary, toggleLike } from "../api/LikeApi";
 import { Heart } from 'lucide-react'
+import DOMPurify from "dompurify";
 
 export default function PostPage() {
     const { id } = useParams();
@@ -55,22 +55,6 @@ export default function PostPage() {
         }
     }, [])
 
-    // 게시글 삭제 <- 휴지통 기능 만듬으로 주석처리
-    // const handleDelete = async () => {
-    //     if (!id) return;
-
-    //     const confirmDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
-    //     if (!confirmDelete) return;
-
-    //     try {
-    //         await deletePost(Number(id));
-    //         alert("게시글이 삭제되었습니다.");
-    //         window.location.href = "/"; // 홈으로 리디렉션
-    //     } catch (error) {
-    //         alert("삭제 실패");
-    //         console.error(error);
-    //     }
-    // }
     // 삭제(휴지통)
     const handleSoftDelete = async () => {
         if (!post?.postId) return;
@@ -85,12 +69,10 @@ export default function PostPage() {
         }
     };
 
-
     // 댓글 작성 / 수정
-
     const handleSubmit = async () => {
         if (!commentText || !userInfo) return;
-
+        // ... (댓글 작성/수정 로직은 변경 없음)
         if (eCommentId) {
             // 수정 모드일 경우
             try {
@@ -140,7 +122,6 @@ export default function PostPage() {
             await deleteCommnet({
                 postId: Number(id),
                 commentId: commentId
-
             });
             alert("댓글이 삭제되었습니다.");
             fetchPostData();
@@ -153,8 +134,8 @@ export default function PostPage() {
     // 댓글 수정
     const handleComEdit = async (comment: Comment) => {
         setCommentText(comment.comment);
-        setECommentId(comment.commentId);
         setOpen(true);
+        setECommentId(comment.commentId);
     };
 
     const handleClose = () => {
@@ -171,8 +152,6 @@ export default function PostPage() {
             await toggleLike(post.postId);
             const summary = await getLikeSummary(post.postId); // liked + likeCount
             setLiked(summary.data.liked);
-            console.log("요약 응답:", summary);
-
             setPost(prev => ({ ...prev, likeCount: summary.data.likeCount }));
         } catch (error) {
             console.error("좋아요 처리 중 오류 발생:", error);
@@ -180,32 +159,75 @@ export default function PostPage() {
 
     };
 
+    //다운로드
+    const downloadFile = async (fileName: string) => {
+        try {
+            const token = sessionStorage.getItem("jwt");
+
+            const res = await fetch(
+                `http://localhost:8080/post/files/download?filename=${encodeURIComponent(fileName)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (!res.ok) throw new Error("파일 다운로드 실패");
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName;  // 저장할 파일 이름 지정
+            document.body.appendChild(link);
+            link.click();
+
+            // 정리
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("다운로드 실패:", error);
+            alert("파일 다운로드 실패");
+        }
+    };
 
 
 
     return (
         <>
             <Container maxWidth="sm">
-                {/* 삭제버튼 */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
-                    <Typography variant="h4">{post.title}</Typography>
-                    {/* 유효하지 않은 유저는 삭제버튼 비활성화 */}
-                    {(userInfo?.userId === post.userId || userInfo?.role === 'ADMIN') && (
-                        <Button variant="outlined" color="error" onClick={handleSoftDelete}>
-                            삭제
-                        </Button>
-                    )}
+                {/* 게시글 제목 및 수정/삭제 버튼 */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 4, borderBottom: '1px solid #eee', pb: 1 }}>
+                    <Typography variant="h4" component="h1">{post.title}</Typography>
 
+                    {/* 수정/삭제 버튼 그룹 (권한 체크) */}
+                    {(userInfo?.userId === post.userId || userInfo?.role === 'ADMIN') && (
+                        <Box display="flex" gap={1}>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => navigate(`/post/edit/${post.postId}`)}
+                            >
+                                수정
+                            </Button>
+                            <Button variant="outlined" color="error" size="small" onClick={handleSoftDelete}>
+                                삭제
+                            </Button>
+                        </Box>
+                    )}
                 </Box>
 
-                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                {/* 작성 정보 및 좋아요 */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2, pt: 1 }}>
                     <Typography variant="body2" color="text.secondary">
                         작성자: {post.nickname} / 작성일: {new Date(post.createAt).toLocaleString()}
                         {post.updateAt && ` / 수정일: ${new Date(post.updateAt).toLocaleString()}`}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={1}>
                         <Typography variant="body2">{post.likeCount}</Typography>
-                        <IconButton onClick={handleLikeToggle}>
+                        <IconButton onClick={handleLikeToggle} disabled={!userInfo}>
                             <Heart
                                 color={liked ? 'red' : 'gray'}
                                 fill={liked ? 'red' : 'none'}
@@ -214,69 +236,89 @@ export default function PostPage() {
                     </Box>
                 </Box>
 
-
+                {/* 첨부파일 보기 버튼 */}
                 <Box display="flex" justifyContent="flex-end" alignItems="center" sx={{ mb: 2 }}>
                     <Button variant="outlined" onClick={() => setShowFiles(prev => !prev)}>
-                        첨부파일 보기
+                        첨부파일 {showFiles ? '숨기기' : '보기'}
                     </Button>
                 </Box>
-                {/* 첨부파일 다운로드 */}
+
+                {/* 이미지 + 본문 내용 (구역 구분 없이 자연스럽게 렌더링) */}
+                <Box sx={{ mb: 3, minHeight: '150px' }}>
+                    {post.fileList
+                        .filter(file => file.imageYn === "Y")
+                        .map((file, idx) => (
+                            <img
+                                key={idx}
+                                src={`http://localhost:8080${file.fileUrl}`}
+                                alt={file.fileOrgname}
+                                style={{
+                                    width: "100%",
+                                    height: "auto",
+                                    borderRadius: 4,
+                                    marginBottom: "12px"
+                                }}
+                            />
+                        ))}
+
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(post.content),
+                        }}
+                    />
+                </Box>
+
+
+                {/* 모든 첨부파일 다운로드 리스트 (이미지 포함) */}
                 {showFiles && (
                     <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
                         <Typography variant="subtitle1">📎 첨부파일</Typography>
                         <List>
-                            {post.fileList
-                                .filter(file => file.imageYn !== "Y")
-                                .map((file, idx) => (
-                                    <ListItem key={idx} sx={{ display: "flex", justifyContent: "space-between" }}>
-                                        <ListItemText
-                                            primary={file.fileOrgname}
-                                            secondary={`용량: ${file.fileSize}KB`} />
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            onClick={() => window.open(file.fileUrl, "_blank")}>
-                                            다운로드
-                                        </Button>
-                                    </ListItem>
-                                ))}
+                            {post.fileList.map((file, idx) => (
+                                <ListItem key={idx} sx={{ display: "flex", justifyContent: "space-between" }}>
+                                    <ListItemText
+                                        primary={file.fileOrgname}
+                                        secondary={`용량: ${file.fileSize}KB / 유형: ${file.imageYn === 'Y' ? '이미지' : '기타'}`}
+                                    />
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => downloadFile(file.fileName)}
+                                    >
+                                        다운로드
+                                    </Button>
+                                </ListItem>
+                            ))}
                         </List>
                     </Paper>
                 )}
 
-                {/* 첨부파일 이미지 */}
-                {post.fileList
-                    .filter(file => file.imageYn === "Y")
-                    .map((file, idx) => (
-                        <img
-                            key={idx}
-                            src={file.fileUrl}
-                            alt={file.fileOrgname}
-                            style={{ width: "100%", marginBottom: "1rem" }}
+                <Typography variant="h6" sx={{ mt: 4 }}>댓글</Typography>
+
+                {/* 댓글 입력 폼 (로그인 시에만 표시) */}
+                {userInfo ? (
+                    <Box display="flex" flexDirection="column" gap={2}>
+                        <TextField
+                            label="댓글"
+                            name="comment"
+                            variant="outlined"
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            multiline
+                            minRows={3}
+                            required
                         />
-
-                    ))}
-
-
-                <Typography variant="body1" sx={{ marginY: 2 }}>{post.content}</Typography>
-                <Typography variant="h6" sx={{ mt: 4 }}></Typography>
-                {/* 댓글 입력 폼 */}
-
-                <Box display="flex" flexDirection="column" gap={2}>
-                    <TextField
-                        label="댓글"
-                        name="comment"
-                        variant="outlined"
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        multiline
-                        minRows={3}
-                        required
-                    />
-                    <Button variant="contained" color="primary" onClick={handleSubmit}>
-                        등록
-                    </Button>
-                </Box>
+                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!commentText.trim()}>
+                            등록
+                        </Button>
+                    </Box>
+                ) : (
+                    <Box sx={{ p: 2, my: 2, border: '1px dashed #ccc', textAlign: 'center' }}>
+                        <Typography variant="body2" color="text.secondary">
+                            댓글을 작성하려면 로그인해주세요.
+                        </Typography>
+                    </Box>
+                )}
 
                 {/* 댓글 목록 표시 */}
                 <Box sx={{ mt: 4 }}>
@@ -286,24 +328,31 @@ export default function PostPage() {
                                 <Typography variant="subtitle2" color="text.secondary">
                                     {comment.nickname}
                                 </Typography>
-                                <Typography variant="body1">
+                                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
                                     {comment.comment}
                                 </Typography>
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => handleComDelete(comment.commentId)}
-                                >
-                                    삭제
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    onClick={() => handleComEdit(comment)}
-                                >
-                                    수정
-                                </Button>
+
+                                {/* 댓글 수정/삭제 버튼은 작성자에게만 표시 */}
+                                {userInfo?.userId === comment.userId || userInfo?.role === "ADMIN" && (
+                                    <Box sx={{ mt: 1, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={() => handleComEdit(comment)}
+                                        >
+                                            수정
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            size="small"
+                                            onClick={() => handleComDelete(comment.commentId)}
+                                        >
+                                            삭제
+                                        </Button>
+                                    </Box>
+                                )}
+
                             </Box>
                         ))
                     ) : (
@@ -311,8 +360,9 @@ export default function PostPage() {
                             아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
                         </Typography>
                     )}
-
                 </Box>
+
+                {/* 댓글 수정 다이얼로그 */}
                 <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
                     <DialogTitle>댓글 수정</DialogTitle>
                     <DialogContent>
@@ -322,7 +372,8 @@ export default function PostPage() {
                             multiline
                             minRows={3}
                             value={commentText}
-                            onChange={(e) => setCommentText(e.target.value)} />
+                            onChange={(e) => setCommentText(e.target.value)}
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>취소</Button>
@@ -330,7 +381,6 @@ export default function PostPage() {
                     </DialogActions>
                 </Dialog>
             </Container>
-
         </>
     );
 }

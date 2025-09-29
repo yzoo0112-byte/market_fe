@@ -50,7 +50,7 @@ export default function TableView() {
             sortOrder,
             keyword: keyword || undefined,
         })
-            .then(({ data,total }) => {
+            .then(({ data, total }) => {
                 const filtered = data.filter((post) => !post.deleted);
                 setPosts(filtered);
                 setTotal(total);
