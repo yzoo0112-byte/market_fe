@@ -40,18 +40,6 @@ export default function Login() {
         setToastOpen(true);
       });
 
-      // //백엔드 예외 처리 알림창
-      // fetch('/users', {
-      //   method: 'POST',
-      //   body: JSON.stringify(data),
-      //   headers: { 'Content-Type': 'application/json' }
-      // })
-      // .then(res => res.json())
-      // .then(result => {
-      //   if (result.error) {
-      //     alert(result.error); // 또는 toast(result.error)
-      //   }
-      // });
   };
 
   return (
@@ -63,6 +51,9 @@ export default function Login() {
           name="loginId"
           value={user.loginId}
           onChange={handleChange}
+          sx={{
+            width: 300, // px 단위
+          }}
         />
         <TextField
           label="PW"
@@ -70,6 +61,10 @@ export default function Login() {
           type="password"
           value={user.password}
           onChange={handleChange}
+          sx={{
+            width: 300,
+            '& .MuiInputBase-input': { fontFamily: 'Arial, sans-serif', fontSize: '0.9rem' }}
+          } // 입력 텍스트
         />
         <Button onClick={handleSignUp}>회원가입</Button>
         <Button color="primary" onClick={handleLogin}>로그인</Button>

@@ -73,6 +73,10 @@ export default function MyPage() {
           label="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          sx={{
+            width: 300,
+            '& .MuiInputBase-input': { fontFamily: 'Arial, sans-serif', fontSize: '0.9rem' }}
+          }
         />
         <Button onClick={handleVerify}>확인</Button>
       </Stack>
