@@ -24,10 +24,10 @@ export default function MainSearch() {
   
 
   return (
-    <Box display="flex" alignItems="center" mb={2}>
+    <Box display="flex" alignItems="center" mt={1}>
       <InputBase
         fullWidth
-        placeholder="검색어를 입력하세요. 해시태그 검색시 #~ #~ 같이 공백으로 구분시켜줘요."
+        placeholder="검색어를 입력하세요"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onSearch()}
@@ -36,7 +36,7 @@ export default function MainSearch() {
           padding: '6px 12px',
           borderRadius: '4px',
           color: '#aaa',
-          width: '600px'
+          width: '1000px'
         }}
       />
       <IconButton onClick={onSearch}>

@@ -33,7 +33,8 @@ export default function Header() {
 
   return (
     <div className="header">
-      <div className="logo">
+      {/* 왼쪽: 로고 */}
+      <div className="header-left">
         <span className="logo-text" onClick={() => navigate("/")}>
           캐럿마켓
         </span>
@@ -41,55 +42,28 @@ export default function Header() {
       {isAuthenticated && userInfo.role === "ROLE_ADMIN" && (
         <Button onClick={() => navigate("/manage/visit")}>관리자 페이지</Button>
       )}
-      <div>
-      </div>
 
-      {/* 일반 사용자일 때 검색창 보이기 */}
-      {!admin && (
-        <Box flex={5} display="flex" justifyContent="center" mt={2}>
+      
+      {/* 가운데: 검색창 또는 관리자 메뉴 */}
+    <div className="header-center">
+      {!admin ? (
+        // {/* 일반 사용자일 때 검색창 보이기 */}
+        <Box width="400px">
           <MainSearch />
         </Box>
+      ) : (
+        // {/* ADMIN에서만 쓸 수 있는 페이지 카테고리 보이기 */}
+        <Box display="flex" gap={1}>
+          <Button className="admin-button" onClick={() => navigate('/manage/fileSetting')}>관리자</Button>
+          <Button className="admin-button" onClick={() => navigate('/manage/users')}>회원데이터</Button>
+          <Button className="admin-button" onClick={() => navigate('/manage/posts')}>게시글데이터</Button>
+          <Button className="admin-button" onClick={() => navigate('/manage/trash')}>휴지통</Button>
+        </Box>
       )}
+    </div>
 
-      {/* ADMIN에서만 쓸 수 있는 페이지 카테고리 보이기 */}
-      {isAuthenticated && admin && (
-        <>
-          <Box display="flex" justifyContent="center" flex={2}>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/manage/fileSetting')}
-            >
-              관리자
-            </Button>
-          </Box>
-          <Box display="flex" justifyContent="center" flex={2}>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/manage/users')}
-            >
-              회원데이터
-            </Button>
-          </Box>
-          <Box display="flex" justifyContent="center" flex={2}>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/manage/posts')}
-            >
-              게시글데이터
-            </Button>
-          </Box>
-          <Box display="flex" justifyContent="center" flex={2}>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/manage/trash')}
-            >
-              휴지통
-            </Button>
-          </Box>
-        </>
-      )}
-
-      <div className="nav-right">
+      {/* 오른쪽: 로그인 버튼 & 아이콘 */}
+      <div className="header-right">
         {isAuthenticated ? (
           <Button onClick={handleLogout}>로그아웃</Button>
         ) : (
