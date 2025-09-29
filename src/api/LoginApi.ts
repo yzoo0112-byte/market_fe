@@ -2,14 +2,12 @@
 import axios from "axios";
 import type { LoginUser, User } from "../type";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+export const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const getAuthToken = async (user: LoginUser) => {
   const response = await axios.post(`${BASE_URL}/login`, user);
   const token = response.headers.authorization;
   sessionStorage.setItem("jwt", token);
-  console.log("응답 헤더 전체:", response.headers);
-  console.log("저장된 토큰:", sessionStorage.getItem("jwt"));//확인용
   return response.data;
 }
 

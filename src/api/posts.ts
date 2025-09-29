@@ -19,4 +19,4 @@ interface ApiResponse {
 export const getPosts = async (params: ParamsType): Promise<ApiResponse> => {
   const response = await axios.get<ApiResponse>('/api/posts', { params });
   return response.data;
-};
+}

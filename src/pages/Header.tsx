@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 export default function Header() {
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout, userInfo } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -20,7 +20,7 @@ export default function Header() {
       navigate("/login");
     }
   };
-
+console.log("권한 확인:", userInfo.role);
 
 
   return (
@@ -30,11 +30,16 @@ export default function Header() {
           캐럿마켓
         </span>
       </div>
+      {isAuthenticated && userInfo.role === "ROLE_ADMIN" && (
+        <Button onClick={() => navigate("/manage/visit")}>관리자 페이지</Button>
+      )}
+      <div>
+      </div>
       <div className="nav-right">
         {isAuthenticated ? (
-          <button onClick={handleLogout}>로그아웃</button>
+          <Button onClick={handleLogout}>로그아웃</Button>
         ) : (
-          <button onClick={() => navigate("/login")}>로그인</button>
+          <Button onClick={() => navigate("/login")}>로그인</Button>
         )}
         <IconButton 
           color="inherit"
