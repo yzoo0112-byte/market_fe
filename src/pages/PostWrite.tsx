@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import {
   Button,
   TextField,
-  Box,
+  Grid,
   IconButton,
   List,
   ListItem,
   ListItemText,
   Container,
   Paper,
-  Grid
+  Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -111,8 +111,8 @@ export default function PostWrite() {
   return (
     <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
       <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12 }}>
+        <Box display="flex" flexDirection="column" gap={3}>
+          <Grid item xs={12}>
             <TextField
               label="제목"
               value={title}
@@ -175,7 +175,7 @@ export default function PostWrite() {
               취소
             </Button>
           </Grid>
-        </Grid>
+        </Box>
       </Paper>
     </Container>
   );
