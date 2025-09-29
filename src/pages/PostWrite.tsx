@@ -3,23 +3,24 @@ import { useNavigate } from "react-router-dom";
 import {
   Button,
   TextField,
-
   Box,
-  Grid,
   IconButton,
   List,
   ListItem,
   ListItemText,
   Container,
   Paper,
+  Grid
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+
 
 export default function PostWrite() {
   const [title, setTitle] = useState("");
   const [hashtag, setHashtags] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,14 +31,45 @@ export default function PostWrite() {
     }
   }, [navigate]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFiles([...files, ...Array.from(e.target.files)]);
+      const newFiles = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...newFiles]);
+
+      for (const file of newFiles) {
+        if (file.type.startsWith("image")) {
+          const formData = new FormData();
+          formData.append("files", file);
+
+          try {
+            const res = await fetch("http://localhost:8080/post/image", {
+              method: "POST",
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("jwt")}`,
+              },
+            });
+
+            // if (!res.ok) throw new Error("이미지 업로드 실패");
+
+            // const result = await res.json();
+            // const imageUrl = `http://localhost:8080/uploads/${result.savedFileName}`;
+
+            // setContent((prev) =>
+            //   prev +
+            //   `\n<img src="${imageUrl}" alt="${file.name}" style="max-width:100%; height:auto;" />\n`
+            // );
+          } catch (error) {
+            console.error("이미지 업로드 중 오류 발생:", error);
+            alert("이미지 업로드 실패: 콘솔을 확인하세요.");
+          }
+        }
+      }
     }
   };
 
   const handleFileRemove = (index: number) => {
-    setFiles(files.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async () => {
@@ -80,7 +112,7 @@ export default function PostWrite() {
     <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
       <Paper elevation={3} sx={{ p: 5, borderRadius: 3 }}>
         <Grid container spacing={4}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               label="제목"
               value={title}
@@ -89,7 +121,7 @@ export default function PostWrite() {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               label="해시태그"
               value={hashtag}
@@ -100,7 +132,7 @@ export default function PostWrite() {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               label="본문 내용"
               value={content}
@@ -111,7 +143,8 @@ export default function PostWrite() {
             />
           </Grid>
 
-          <Grid item xs={12}>
+
+          <Grid size={{ xs: 12 }}>
             <Box display="flex" alignItems="center" gap={2}>
               <Button variant="outlined" component="label">
                 파일 업로드
@@ -134,7 +167,7 @@ export default function PostWrite() {
             </List>
           </Grid>
 
-          <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
+          <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end" gap={2}>
             <Button variant="contained" color="primary" onClick={handleSave}>
               등록
             </Button>
