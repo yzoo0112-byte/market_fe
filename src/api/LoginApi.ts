@@ -25,3 +25,8 @@ export const checkDuplicateNickname = async (nickname: string): Promise<boolean>
   const res = await axios.get("/api/signup/ncheck", { params: { nickname } });
   return res.data;
 };
+
+export const checkDuplicatePhone = async (phoneNum: string): Promise<boolean> => {
+  const res = await axios.get("/api/signup/pcheck", { params: { phoneNum } });
+  return res.data;
+};

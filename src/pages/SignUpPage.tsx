@@ -2,7 +2,7 @@ import { Button, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { User } from "../type";
-import { checkDuplicateEmail, checkDuplicateNickname, signUp } from "../api/LoginApi";
+import { checkDuplicateEmail, checkDuplicateNickname, checkDuplicatePhone, signUp } from "../api/LoginApi";
 
 export default function SignUpPage() {
     const navigate = useNavigate();
@@ -38,49 +38,52 @@ export default function SignUpPage() {
 
 
     const handleCheckEmail = () => {
-    checkDuplicateEmail(user.email).then((exists) => {
-        setEmailCheck(exists);
-    });
+        checkDuplicateEmail(user.email).then((exists) => {
+            setEmailCheck(exists);
+        });
     };
 
     const handleCheckNickname = () => {
-    checkDuplicateNickname(user.nickname).then((exists) => {
-        setNicknameCheck(exists);
-    });
+        checkDuplicateNickname(user.nickname).then((exists) => {
+            setNicknameCheck(exists);
+        });
     };
-
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUser({...user, [e.target.name]: e.target.value});
     }
 
 
-    const handleSign = () => {
-        const missingFields = (Object.keys(user) as (keyof User)[])
-            .filter((key) => !user[key])
-            .map((key) => fieldLabels[key]);
+    const handleSign = async () => {
+    const missingFields = (Object.keys(user) as (keyof User)[])
+        .filter((key) => !user[key])
+        .map((key) => fieldLabels[key]);
 
-        if (missingFields.length > 0) {
-            alert(`${missingFields.join(", ")}을 작성해주세요`);
-            return;
-        }
-
-        if (emailCheck === null || nicknameCheck === null) {
-            alert("이메일과 닉네임의 중복 확인을 먼저 해주세요.");
-            return;
-        }
-
-
-        signUp(user)
-            .then(() => {
-            alert("회원가입 성공!");
-            navigate("/login");
-            })
-            .catch(() => {
-            alert("회원가입에 실패했습니다.");
-            });
+    if (missingFields.length > 0) {
+        alert(`${missingFields.join(", ")}을 작성해주세요`);
+        return;
     }
+
+    if (emailCheck === null || nicknameCheck === null) {
+        alert("이메일과 닉네임의 중복 확인을 먼저 해주세요.");
+        return;
+    }
+
+    try {
+        const phoneExists = await checkDuplicatePhone(user.phoneNum);
+
+        if (phoneExists) {
+        alert("이미 가입한 전화번호입니다.");
+        return;
+        }
+
+        await signUp(user);
+        alert("회원가입 성공!");
+        navigate("/login");
+    } catch (error) {
+        alert("회원가입에 실패했습니다.");
+    }
+    };
 
     return(
         <>

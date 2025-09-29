@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { User } from "../type";
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { Button, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import { deleteUserAccount, getUserInfo, updateUserInfo, verifyPassword } from "../api/MyPageApi";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store";
+import { checkDuplicateEmail, checkDuplicateNickname, checkDuplicatePhone } from "../api/LoginApi";
 
 
 export default function MyPage() {
@@ -12,6 +13,17 @@ export default function MyPage() {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const {logout} = useAuthStore();
   const navigate = useNavigate();
+
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const [emailCheck, setEmailCheck] = useState<null | boolean>(null);
+  const [nicknameCheck, setNicknameCheck] = useState<null | boolean>(null);
+
+  const showToast = (message: string) => {
+  setToastMessage(message);
+  setToastOpen(true);
+};
 
   const handleVerify = () => {
     verifyPassword(password)
@@ -67,6 +79,48 @@ export default function MyPage() {
     );
   }
 
+  const handleUpdateUserInfo = async () => {
+    if (!userInfo) return;
+
+    try {
+      const phoneExists = await checkDuplicatePhone(userInfo.phoneNum);
+
+      if (phoneExists) {
+        showToast("이미 가입한 전화번호입니다.");
+        return;
+      }
+
+      await updateUserInfo(userInfo);
+      showToast("회원정보가 성공적으로 수정되었습니다.");
+    } catch (error) {
+      showToast("회원정보 수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleCheckEmail = () => {
+    if (!userInfo?.email) {
+      showToast("이메일을 입력해주세요.");
+      return;
+    }
+    checkDuplicateEmail(userInfo.email).then((exists) => {
+      setEmailCheck(exists);
+      showToast(exists ? "이미 존재하는 이메일입니다." : "사용 가능한 이메일입니다.");
+    });
+  };
+
+  const handleCheckNickname = () => {
+    if (!userInfo?.nickname) {
+      showToast("닉네임을 입력해주세요.");
+      return;
+    }
+    checkDuplicateNickname(userInfo.nickname).then((exists) => {
+      setNicknameCheck(exists);
+      showToast(exists ? "이미 존재하는 닉네임입니다." : "사용 가능한 닉네임입니다.");
+    });
+  };
+
+ 
+
   return (
     <Stack spacing={2} mt={4}>
       <Typography variant="h5">마이페이지</Typography>
@@ -78,6 +132,10 @@ export default function MyPage() {
           setUserInfo((prev) => ({ ...prev!, nickname: e.target.value }))
         }
       />
+      <Button onClick={handleCheckNickname}>중복 확인</Button>
+      {nicknameCheck === true && <span style={{ color: "red" }}>이미 존재하는 닉네임입니다</span>}
+      {nicknameCheck === false && <span style={{ color: "green" }}>사용 가능한 닉네임입니다</span>}
+            
       <TextField
         label="이름"
         value={userInfo?.userName}
@@ -92,6 +150,7 @@ export default function MyPage() {
           setUserInfo((prev) => ({ ...prev!, phoneNum: e.target.value }))
         }
       />
+            
       <TextField
         label="생년월일"
         value={userInfo?.birth}
@@ -106,6 +165,9 @@ export default function MyPage() {
           setUserInfo((prev) => ({ ...prev!, email: e.target.value }))
         }
       />
+      <Button onClick={handleCheckEmail}>중복 확인</Button>
+            {emailCheck === true && <span style={{ color: "red" }}>이미 존재하는 이메일입니다</span>}
+            {emailCheck === false && <span style={{ color: "green" }}>사용 가능한 이메일입니다</span>}
       <TextField
         label="주소"
         value={userInfo?.addr}
@@ -114,18 +176,16 @@ export default function MyPage() {
         }
       />
 
-      {/* 다른 항목들도 동일하게 표시 및 수정 가능 */}
-      <Button
-        onClick={() => {
-          updateUserInfo(userInfo!).then(() => alert("수정 완료"));
-        }}
-      >
-        수정하기
-      </Button>
-
+      <Button onClick={handleUpdateUserInfo}>수정하기</Button>
             <Button color="error" onClick={handleDeleteAccount}>
         회원탈퇴
       </Button>
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={() => setToastOpen(false)}
+        message={toastMessage}
+      />
     </Stack>
   );
 }
