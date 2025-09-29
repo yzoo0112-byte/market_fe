@@ -101,6 +101,10 @@ export default function SignUpPage() {
                 type="password"
                 value={user.password}
                 onChange={handleChange}
+                sx={{
+                    width: 184,
+                    '& .MuiInputBase-input': { fontFamily: 'Arial, sans-serif', fontSize: '0.9rem' }}
+                }
             />
             <TextField
                 label="이메일"
