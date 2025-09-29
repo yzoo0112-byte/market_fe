@@ -333,7 +333,7 @@ export default function PostPage() {
                                 </Typography>
 
                                 {/* 댓글 수정/삭제 버튼은 작성자에게만 표시 */}
-                                {/* {userInfo?.userId === comment.userId || userInfo?.role === "ADMIN" && (
+                                {userInfo?.userId === comment.userId || userInfo?.role === "ADMIN" && (
                                     <Box sx={{ mt: 1, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                                         <Button
                                             variant="outlined"
@@ -351,22 +351,8 @@ export default function PostPage() {
                                             삭제
                                         </Button>
                                     </Box>
-                                )} */}
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => handleComDelete(comment.commentId)}
-                                >
-                                    삭제
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    onClick={() => handleComEdit(comment)}
-                                >
-                                    수정
-                                </Button>
+                                )}
+
                             </Box>
                         ))
                     ) : (
