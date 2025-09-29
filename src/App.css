@@ -1,17 +1,35 @@
 #root {
+  font-family: 'MeMoment', sans-serif !important;
+  color: #ff9b49;
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
 }
 
+html, body {
+  width: 100%;
+  min-width: 1000px; /* 페이지 전체 최소 너비 */
+  margin: 0;
+  padding: 0;
+}
+
 .logo {
-  font-size: 24px;
+  font-size: 35px;
   font-weight: bold;
   padding: 0;
   cursor: pointer;
   user-select: none;
 
 }
+
+.logo-text {
+  font-size: 35px;   /* 원하는 글꼴 크기 */
+  font-weight: bold;
+  line-height: 1;    /* flex 영향으로 작아지는 것을 방지 */
+  cursor: pointer;
+  user-select: none;
+}
+
 
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
@@ -31,9 +49,17 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: transparent;
   z-index: 1000;
+  min-width: 1000px; /* body와 같은 값으로 맞추기 */
 }
+
+.logo-search {
+  flex: 1;                 /* 동일한 너비 배분 */
+  display: flex;          /* 가로 배치 */
+  align-items: center;    /* 세로 가운데 정렬 */
+}
+
 
 
 .nav-right button {
@@ -42,6 +68,40 @@
   cursor: pointer;
 }
 
+.header-left,
+.header-center,
+.header-right {
+  flex: 1; /* 3분할 */
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  justify-content: flex-start; /* 왼쪽 정렬 */
+}
+
+.header-center {
+  justify-content: center;   /* 무조건 중앙 */
+}
+
+.header-right {
+  justify-content: flex-end; /* 오른쪽 정렬 */
+}
+
+.admin-button {
+  color: #000 !important;    /* 글자 색상 */
+  min-width: 700px;            /* 최소 너비 */
+  padding: 6px 16px;           /* 안쪽 여백 */
+  border: none;                /* 테두리 제거 */
+  border-radius: 4px;          /* 모서리 둥글게 */
+  cursor: pointer;             /* 마우스 포인터 */
+  font-size: 14px;             /* 글자 크기 */
+  transition: background 0.3s;
+}
+
+.admin-button:hover {
+  color: #ff9b49 !important;    /* 글자 색상 */
+}
 
 @keyframes logo-spin {
   from {
@@ -65,4 +125,11 @@
 
 .read-the-docs {
   color: #888;
+}
+
+@font-face {
+  font-family: 'MeMoment';
+  src: url('/fonts/memomentKkukkkuk.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }

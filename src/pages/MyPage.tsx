@@ -135,7 +135,17 @@ export default function MyPage() {
       <Button onClick={handleCheckNickname}>중복 확인</Button>
       {nicknameCheck === true && <span style={{ color: "red" }}>이미 존재하는 닉네임입니다</span>}
       {nicknameCheck === false && <span style={{ color: "green" }}>사용 가능한 닉네임입니다</span>}
-            
+      <TextField
+        label="이메일"
+        value={userInfo?.email}
+        onChange={(e) =>
+          setUserInfo((prev) => ({ ...prev!, email: e.target.value }))
+        }
+      />
+      <Button onClick={handleCheckEmail}>중복 확인</Button>
+            {emailCheck === true && <span style={{ color: "red" }}>이미 존재하는 이메일입니다</span>}
+            {emailCheck === false && <span style={{ color: "green" }}>사용 가능한 이메일입니다</span>}
+      
       <TextField
         label="이름"
         value={userInfo?.userName}
@@ -149,8 +159,7 @@ export default function MyPage() {
         onChange={(e) =>
           setUserInfo((prev) => ({ ...prev!, phoneNum: e.target.value }))
         }
-      />
-            
+      />    
       <TextField
         label="생년월일"
         value={userInfo?.birth}
@@ -159,23 +168,12 @@ export default function MyPage() {
         }
       />
       <TextField
-        label="이메일"
-        value={userInfo?.email}
-        onChange={(e) =>
-          setUserInfo((prev) => ({ ...prev!, email: e.target.value }))
-        }
-      />
-      <Button onClick={handleCheckEmail}>중복 확인</Button>
-            {emailCheck === true && <span style={{ color: "red" }}>이미 존재하는 이메일입니다</span>}
-            {emailCheck === false && <span style={{ color: "green" }}>사용 가능한 이메일입니다</span>}
-      <TextField
         label="주소"
         value={userInfo?.addr}
         onChange={(e) =>
           setUserInfo((prev) => ({ ...prev!, addr: e.target.value }))
         }
       />
-
       <Button onClick={handleUpdateUserInfo}>수정하기</Button>
             <Button color="error" onClick={handleDeleteAccount}>
         회원탈퇴
